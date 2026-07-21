@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>麥坤圖鑑小學堂</title>
+<style>
+  :root{
+    --red:#e32017; --red-d:#b8160f; --blue:#1f4e9b; --yellow:#ffd21a;
+    --ink:#2b2b35; --paper:#fff7ec; --card:#ffffff; --line:#ffe2b8;
+    --good:#2e9d5b; --shadow:0 6px 0 rgba(0,0,0,.12);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:"PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+    background:linear-gradient(180deg,#fff3d6 0%,#ffe7c2 100%);
+    color:var(--ink); line-height:1.55; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:0 14px 60px;}
+  /* top nav */
+  nav{
+    position:sticky;top:0;z-index:20;background:var(--red);
+    box-shadow:0 3px 0 var(--red-d);
+  }
+  nav .row{max-width:1040px;margin:0 auto;display:flex;gap:6px;overflow:auto;padding:10px 12px;}
+  nav a{
+    color:#fff;text-decoration:none;font-weight:700;font-size:16px;
+    background:rgba(255,255,255,.16);padding:8px 14px;border-radius:999px;white-space:nowrap;
+  }
+  nav a:active{transform:translateY(2px);}
+  /* hero */
+  header.hero{
+    text-align:center;padding:26px 14px 18px;
+  }
+  .hero-badge{
+    display:inline-block;background:var(--yellow);color:var(--ink);
+    font-weight:800;border-radius:14px;padding:4px 14px;font-size:15px;
+    box-shadow:var(--shadow);transform:rotate(-2deg);
+  }
+  h1{font-size:clamp(28px,7vw,46px);margin:12px 0 4px;color:var(--red);text-shadow:2px 2px 0 #fff;}
+  .hero p{font-size:clamp(15px,3.6vw,19px);margin:6px auto 0;max-width:680px;color:#5a4a36;}
+  .hero-car{width:min(340px,80%);margin:8px auto 0;display:block;}
+  /* sections */
+  section{padding:22px 0 6px;}
+  h2.sec{
+    font-size:clamp(22px,5vw,32px);color:#fff;background:var(--blue);
+    display:inline-block;padding:8px 18px;border-radius:14px;margin:0 0 6px;
+    box-shadow:var(--shadow);
+  }
+  .sec-sub{color:#7a6647;font-size:15px;margin:4px 0 16px;}
+  /* how-to cards */
+  .howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:8px;}
+  .howto .c{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:16px;}
+  .howto .c b{color:var(--red);font-size:18px;}
+  .howto .c p{margin:6px 0 0;font-size:15px;color:#5a4a36;}
+  /* grid of cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+  .card{
+    background:var(--card);border:3px solid var(--line);border-radius:20px;
+    padding:14px;box-shadow:var(--shadow);transition:transform .12s;
+  }
+  .card:active{transform:scale(.97);}
+  .card .pic{
+    background:radial-gradient(circle at 50% 35%,#fff,#ffeccb);
+    border-radius:16px;padding:6px;display:flex;justify-content:center;
+  }
+  .card .pic svg{width:100%;height:auto;max-width:230px;}
+  .card h3{margin:10px 0 2px;font-size:19px;color:var(--ink);}
+  .card .en{font-size:13px;color:#9a8a6c;margin:0 0 6px;}
+  .card .tag{
+    display:inline-block;font-size:13px;font-weight:700;color:#fff;
+    background:var(--red);border-radius:999px;padding:2px 10px;margin-bottom:6px;
+  }
+  .card ul{margin:6px 0 0;padding-left:18px;font-size:14px;color:#4a3f2e;}
+  .card ul li{margin:2px 0;}
+  .chip{display:inline-block;font-size:13px;font-weight:700;border-radius:8px;padding:2px 8px;margin:2px 4px 0 0;color:#fff;}
+  /* sticker book */
+  .book{
+    background:var(--card);border:4px dashed var(--red);border-radius:22px;
+    padding:18px;margin-top:8px;
+  }
+  .progress{height:22px;background:#ffe2b8;border-radius:999px;overflow:hidden;margin:6px 0 14px;}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--red));width:0;transition:width .4s;}
+  .stickers{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:14px;}
+  .stk{text-align:center;}
+  .stk .frame{
+    background:radial-gradient(circle at 50% 35%,#fff,#ffeccb);
+    border-radius:18px;padding:8px;border:3px solid var(--yellow);
+    box-shadow:var(--shadow);
+  }
+  .stk.locked .frame{filter:grayscale(1) brightness(1.05);opacity:.45;border-color:#ccc;}
+  .stk .frame svg{width:100%;height:auto;max-width:120px;}
+  .stk .nm{font-size:13px;font-weight:700;margin-top:6px;color:#5a4a36;}
+  .stk.locked .nm{color:#aaa;}
+  /* quiz */
+  .quiz{
+    background:var(--card);border:3px solid var(--line);border-radius:22px;
+    padding:18px;margin-top:8px;box-shadow:var(--shadow);
+  }
+  .qtext{font-size:clamp(19px,4.4vw,26px);font-weight:800;color:var(--ink);margin:4px 0 14px;}
+  .symbols{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 0 16px;}
+  .symbols svg{width:46px;height:46px;}
+  .qcar{display:flex;justify-content:center;margin:4px 0 14px;}
+  .qcar svg{width:min(260px,70%);height:auto;}
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;}
+  .opt{
+    font-size:clamp(18px,4vw,24px);font-weight:800;color:var(--ink);
+    background:#fff;border:3px solid var(--blue);border-radius:16px;
+    padding:14px 8px;cursor:pointer;box-shadow:var(--shadow);
+  }
+  .opt:active{transform:translateY(3px);box-shadow:none;}
+  .opt.correct{background:var(--good);color:#fff;border-color:#1c7a42;}
+  .opt.wrong{background:#e3563f;color:#fff;border-color:#b53b27;}
+  .feedback{text-align:center;font-size:20px;font-weight:800;margin:14px 0 4px;min-height:26px;}
+  .feedback.good{color:var(--good);}
+  .feedback.bad{color:#c0392b;}
+  .nextbtn,.resetbtn{
+    display:block;margin:10px auto 0;font-size:18px;font-weight:800;color:#fff;
+    background:var(--red);border:none;border-radius:14px;padding:12px 26px;box-shadow:var(--shadow);cursor:pointer;
+  }
+  .nextbtn:active,.resetbtn:active{transform:translateY(3px);box-shadow:none;}
+  .resetbtn{background:#9a8a6c;font-size:14px;padding:8px 18px;}
+  .get-sticker{display:flex;justify-content:center;margin:10px 0;}
+  .get-sticker svg{width:120px;height:auto;animation:pop .5s ease;}
+  @keyframes pop{0%{transform:scale(.2) rotate(-20deg);opacity:0;}70%{transform:scale(1.15) rotate(6deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+  footer{text-align:center;color:#9a8a6c;font-size:13px;margin-top:34px;line-height:1.7;}
+  .badge-note{background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px;color:#7a6647;margin-top:10px;}
+  /* ratio question (圖案規律) */
+  .ratio-box{display:flex;flex-direction:column;gap:10px;align-items:center;margin:6px 0 10px;}
+  .prow{display:flex;align-items:center;gap:12px;justify-content:center;flex-wrap:wrap;
+    background:#fff8ec;border:2px dashed var(--line);border-radius:14px;padding:8px 14px;width:100%;max-width:560px;}
+  .prow-l,.prow-r{display:flex;gap:5px;flex-wrap:wrap;align-items:center;justify-content:center;}
+  .prow svg{width:36px;height:36px;}
+  .peq{font-weight:800;font-size:22px;color:#7a6647;}
+  .qmark{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;
+    border:3px dashed var(--red);border-radius:10px;color:var(--red);font-weight:800;font-size:26px;background:#fff;}
+  .qsub{text-align:center;font-size:16px;color:#5a4a36;margin:2px 0 12px;font-weight:700;}
+  .speak-btn{display:inline-flex;align-items:center;gap:6px;margin:0 auto 12px;font-size:15px;font-weight:700;
+    color:#fff;background:#1f4e9b;border:none;border-radius:12px;padding:8px 16px;box-shadow:var(--shadow);cursor:pointer;}
+  .speak-btn:active{transform:translateY(2px);box-shadow:none;}
+  /* 用家自訂圖片（個人使用，不外傳） */
+  .card .pic{position:relative;}
+  #heroCar{position:relative;}
+  .photobtn{position:absolute;top:6px;right:6px;width:34px;height:34px;border-radius:50%;border:none;
+    background:rgba(31,78,155,.92);color:#fff;font-size:16px;cursor:pointer;padding:0;
+    box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;}
+  .photobtn:active{transform:scale(.92);}
+  .userimg{width:100%;height:auto;display:block;border-radius:12px;}
+  .quserimg{width:min(260px,70%);height:auto;border-radius:16px;display:block;margin:0 auto;}
+</style>
+</head>
+<body>
+<nav><div class="row">
+  <a href="#how">點玩</a>
+  <a href="#forms">麥坤形態</a>
+  <a href="#friends">麥坤朋友</a>
+  <a href="#book">貼紙簿</a>
+  <a href="#quiz">玩遊戲</a>
+</div></nav>
+
+<header class="hero">
+  <span class="hero-badge">5歲都可以玩！</span>
+  <h1>麥坤圖鑑小學堂</h1>
+  <p>同閃電麥坤一齊認顏色、數數字、學英文，答對題目就攞麥坤貼紙，集齊一本貼紙簿！</p>
+  <div class="hero-car" id="heroCar"></div>
+</header>
+
+<div class="wrap">
+
+  <section id="how">
+    <h2 class="sec">點玩？</h2>
+    <div class="howto">
+      <div class="c"><b>1. 睇圖鑑</b><p>睇麥坤唔同嘅樣，同埋佢嘅好朋友。認顏色、認數字 95。</p></div>
+      <div class="c"><b>2. 玩遊戲</b><p>數圖案、跟規律（例如 1 粒星 = 2 個正方形）、認角色。全部都係 5 歲程度。</p></div>
+      <div class="c"><b>3. 攞貼紙</b><p>答啱一題，就得到一張麥坤形狀貼紙！</p></div>
+      <div class="c"><b>4. 集貼紙簿</b><p>集齊 6 款麥坤貼紙，就完成一本貼紙簿啦！</p></div>
+    </div>
+  </section>
+
+  <section id="forms">
+    <h2 class="sec">麥坤嘅形態</h2>
+    <p class="sec-sub">麥坤喺唔同電影入面有唔同嘅樣，全部都係車號 95 添！</p>
+    <div class="grid" id="formsGrid"></div>
+  </section>
+
+  <section id="friends">
+    <h2 class="sec">麥坤出動過嘅角色</h2>
+    <p class="sec-sub">呢啲係同麥坤一齊出現過嘅朋友同對手，遊戲題目都係關於佢哋。</p>
+    <div class="grid" id="friendsGrid"></div>
+  </section>
+
+  <section id="book">
+    <h2 class="sec">麥坤貼紙簿</h2>
+    <p class="sec-sub">答啱題目就會 unlock 一張麥坤貼紙，目標集齊 6 款！</p>
+    <div class="book">
+      <div class="progress"><i id="progBar"></i></div>
+      <div style="text-align:center;font-weight:800;color:#7a6647" id="progTxt"></div>
+      <div class="stickers" id="stickerBook"></div>
+      <div class="badge-note" id="bookNote"></div>
+      <button class="resetbtn" id="resetBtn">重設貼紙簿（家長用）</button>
+      <button class="resetbtn" id="resetImgsBtn">重設我嘅圖片（家長用）</button>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <h2 class="sec">玩遊戲</h2>
+    <p class="sec-sub">星、正方形、三角形、圓形——跟規律數數，答啱就有麥坤貼紙！</p>
+    <div class="quiz" id="quizBox"></div>
+  </section>
+
+  <footer>
+    麥坤圖鑑小學堂 · 原創 SVG 插畫，無使用迪士尼／Pixar 圖像，純屬教育用途。<br>
+    想用返電影原版角色，撳每張圖右上角 📷 加入你自己的圖片（只留喺呢部機，唔上傳、唔外傳，純個人屋企用）。<br>
+    適合 3–8 歲親子共玩，對準升小面試準備。
+  </footer>
+
+</div>
+
+<script>
+/* ---------- 工具：顏色變深 ---------- */
+function shade(hex, f){
+  f = f || 0.78;
+  var c = hex.replace('#','');
+  if(c.length===3) c = c.split('').map(function(x){return x+x;}).join('');
+  var r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16);
+  r = Math.round(r*f); g = Math.round(g*f); b = Math.round(b*f);
+  return 'rgb('+r+','+g+','+b+')';
+}
+function wheel(x){
+  return '<circle cx="'+x+'" cy="118" r="18" fill="#2b2b35"/><circle cx="'+x+'" cy="118" r="8" fill="#cfcfcf"/>';
+}
+function eyeSvg(x,y){
+  return '<circle cx="'+x+'" cy="'+y+'" r="7" fill="#fff"/><circle cx="'+x+'" cy="'+y+'" r="3.4" fill="#2b2b35"/>';
+}
+/* ---------- 畫車（原創 SVG） ---------- */
+function drawCar(o){
+  o = o || {};
+  var body = o.body || '#e32017';
+  var roof = o.roof || shade(body,0.8);
+  var num = o.num || '';
+  var kind = o.kind || 'racer';
+  var lightning = o.lightning;
+  var headlight = o.headlight;
+  var eye = (o.eye !== false);
+  var s = '<svg viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">';
+  s += '<ellipse cx="110" cy="135" rx="86" ry="9" fill="rgba(0,0,0,.12)"/>';
+  s += wheel(62) + wheel(158);
+  s += '<rect x="26" y="72" width="168" height="40" rx="18" fill="'+body+'"/>';
+  if(kind==='truck'){
+    s += '<rect x="36" y="44" width="66" height="32" rx="12" fill="'+roof+'"/>';
+    s += '<rect x="110" y="80" width="82" height="20" rx="8" fill="'+roof+'"/>';
+    s += '<path d="M196,92 q16,2 16,16" fill="none" stroke="#555" stroke-width="4" stroke-linecap="round"/>';
+  } else {
+    s += '<rect x="64" y="40" width="92" height="36" rx="15" fill="'+roof+'"/>';
+  }
+  if(kind==='truck'){
+    s += '<rect x="44" y="50" width="50" height="22" rx="7" fill="#bfe3ff"/>';
+  } else {
+    s += '<rect x="72" y="46" width="76" height="24" rx="9" fill="#bfe3ff"/>';
+    s += '<rect x="108" y="46" width="4" height="24" fill="'+body+'"/>';
+  }
+  if(eye){
+    if(kind==='truck'){ s += eyeSvg(58,61)+eyeSvg(84,61); }
+    else { s += eyeSvg(88,58)+eyeSvg(110,58); }
+  }
+  if(num){
+    s += '<circle cx="150" cy="92" r="14" fill="#fff" stroke="#222" stroke-width="2"/>';
+    s += '<text x="150" y="97" font-size="15" font-weight="700" text-anchor="middle" fill="#222">'+num+'</text>';
+  }
+  if(lightning){
+    s += '<path d="M52,78 L43,96 L52,94 L45,110 L63,84 L53,87 L61,78 Z" fill="#ffd21a" stroke="#e0a800" stroke-width="1.5" stroke-linejoin="round"/>';
+  }
+  if(headlight){
+    s += '<circle cx="190" cy="92" r="6" fill="#fff3b0" stroke="#e0a800" stroke-width="1.5"/>';
+  }
+  s += '</svg>';
+  return s;
+}
+/* ---------- 星星 / 三角形 ---------- */
+function starPath(cx,cy,R,r,pts){
+  pts = pts||5; var p='';
+  for(var i=0;i<pts*2;i++){
+    var ang = Math.PI/pts*i - Math.PI/2;
+    var rad = (i%2)? r:R;
+    var x = cx+Math.cos(ang)*rad, y = cy+Math.sin(ang)*rad;
+    p += (i?'L':'M')+x.toFixed(1)+','+y.toFixed(1);
+  }
+  return p+'Z';
+}
+function drawStar(color){
+  return '<svg viewBox="0 0 40 40"><path d="'+starPath(20,20,18,8)+'" fill="'+(color||'#ffd21a')+'" stroke="#e0a800" stroke-width="2" stroke-linejoin="round"/></svg>';
+}
+function drawTri(color){
+  return '<svg viewBox="0 0 40 40"><polygon points="20,5 36,34 4,34" fill="'+(color||'#37b24d')+'" stroke="#2b8a3e" stroke-width="2" stroke-linejoin="round"/></svg>';
+}
+/* ---------- 更多圖形：正方形 / 圓 / 心形 / 菱形 ---------- */
+function drawSquare(color){
+  return '<svg viewBox="0 0 40 40"><rect x="5" y="5" width="30" height="30" rx="5" fill="'+(color||'#e32017')+'" stroke="rgba(0,0,0,.28)" stroke-width="2"/></svg>';
+}
+function drawCircle(color){
+  return '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="'+(color||'#1f4e9b')+'" stroke="rgba(0,0,0,.28)" stroke-width="2"/></svg>';
+}
+function drawHeart(color){
+  return '<svg viewBox="0 0 40 40"><path d="M20,34 C2,22 6,6 20,12 C34,6 38,22 20,34 Z" fill="'+(color||'#e64980')+'" stroke="rgba(0,0,0,.28)" stroke-width="2" stroke-linejoin="round"/></svg>';
+}
+function drawDiamond(color){
+  return '<svg viewBox="0 0 40 40"><polygon points="20,4 36,20 20,36 4,20" fill="'+(color||'#7048e8')+'" stroke="rgba(0,0,0,.28)" stroke-width="2" stroke-linejoin="round"/></svg>';
+}
+/* ---------- 圖形字典（中英名 + 顏色 + 畫法） ---------- */
+var SHAPE = {
+  star:    {zh:'星',     en:'star',     color:'#ffd21a', draw:drawStar},
+  square:  {zh:'正方形', en:'square',   color:'#e32017', draw:drawSquare},
+  triangle:{zh:'三角形', en:'triangle', color:'#37b24d', draw:drawTri},
+  circle:  {zh:'圓形',   en:'circle',   color:'#1f4e9b', draw:drawCircle},
+  heart:   {zh:'心形',   en:'heart',    color:'#e64980', draw:drawHeart},
+  diamond: {zh:'菱形',   en:'diamond',  color:'#7048e8', draw:drawDiamond}
+};
+var numWord = ['','one','two','three','four','five','six','seven','eight','nine','ten'];
+function plEN(en,c){ return (c===1)? en : en+'s'; }
+function vbEN(c){ return (c===1)? 'equals' : 'equal'; }
+/* ---------- 英文發音（Web Speech） ---------- */
+function speakEN(txt){
+  try{
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(txt);
+    u.lang='en-US'; u.rate=0.85; u.pitch=1.15;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- 資料：麥坤形態 ---------- */
+var forms = [
+  {id:'classic', name:'經典麥坤', en:'Classic Rust-eze', movie:'Cars 1', body:'#e32017', num:'95', lightning:true, learn:['紅色 red','車號 95','閃電 lightning']},
+  {id:'wgp', name:'世界大賽麥坤', en:'World Grand Prix', movie:'Cars 2', body:'#e32017', num:'95', headlight:true, flame:true, learn:['有真正車頭燈','火焰花紋','一樣係 95']},
+  {id:'trainer', name:'教練麥坤', en:'Cars 3 Trainer', movie:'Cars 3', body:'#e32017', num:'95', lightning:true, learn:['做 Cruz 嘅師傅','教人點 race','車號 95']},
+  {id:'primer', name:'灰色底漆麥坤', en:'Primer McQueen', movie:'Cars 3', body:'#9a9a9a', num:'95', learn:['灰色 = 未上色','意外之後','會再變返紅']},
+  {id:'mud', name:'泥漿麥坤', en:'Chester Whipplefilter', movie:'Cars 3', body:'#6b4f2a', num:'95', learn:['用泥遮住自己','去玩 demolition','唔俾人認出']},
+  {id:'fabulous', name:'藍色麥坤', en:'Fabulous Lightning McQueen', movie:'Cars 3', body:'#1f4e9b', num:'95', learn:['藍色 blue','致敬 Doc Hudson','好有心思']}
+];
+
+/* ---------- 資料：麥坤出動過嘅角色 ---------- */
+var friends = [
+  {id:'mater', name:'拖車阿麥', en:'Mater', type:'拖車 tow truck', body:'#7a5a32', kind:'truck', rel:'最佳朋友', fact:'鍾意講笑話，好好玩'},
+  {id:'sally', name:'莎莉', en:'Sally Carrera', type:'跑車 sports car', body:'#2a7de1', kind:'racer', rel:'女朋友', fact:'來自加州，好叻'},
+  {id:'doc', name:'韓德士醫生', en:'Doc Hudson', type:'藍色跑車', body:'#1f4e9b', kind:'racer', rel:'師父', fact:'以前係冠軍車'},
+  {id:'cruz', name:'嘉露斯', en:'Cruz Ramirez', type:'黃色跑車', body:'#ffc800', kind:'racer', rel:'徒弟', fact:'充滿活力嘅女車'},
+  {id:'ramone', name:'雷蒙', en:'Ramone', type:'經常換色嘅車', body:'#1f9bd6', kind:'racer', rel:'Radiator Springs 朋友', fact:'最鍾意噴漆'},
+  {id:'luigi', name:'路易仔', en:'Luigi', type:'意大利車', body:'#f2c200', kind:'racer', rel:'車軚店老闆', fact:'鍾意意大利粉'},
+  {id:'fillmore', name:'花律', en:'Fillmore', type:'和平車', body:'#3fae5a', kind:'truck', rel:'和平主義者', fact:'食有機嘢最健康'},
+  {id:'sarge', name:'沙治', en:'Sarge', type:'軍車', body:'#4e6b2a', kind:'truck', rel:'老兵', fact:'好守規矩'},
+  {id:'sheriff', name:'警長', en:'Sheriff', type:'警車', body:'#3a3a3a', kind:'truck', rel:'小鎮警察', fact:'睇住大家安全'},
+  {id:'red', name:'紅色消防車', en:'Red', type:'消防車', body:'#d62828', kind:'truck', rel:'默默付出', fact:'鍾意淋花'},
+  {id:'chick', name:'積克', en:'Chick Hicks', type:'綠色跑車', body:'#3fa535', kind:'racer', rel:'對手', fact:'常常唔守規矩'},
+  {id:'storm', name:'積遜暴風', en:'Jackson Storm', type:'黑藍跑車', body:'#222a44', kind:'racer', rel:'新對手', fact:'好快好叻嘅新車'}
+];
+
+/* ---------- 用家自訂圖片（個人使用，圖留喺部機，永不上傳） ---------- */
+var UIMGS_KEY = 'mcqueen_user_imgs_v1';
+function loadUserImgs(){ try{ return JSON.parse(localStorage.getItem(UIMGS_KEY)||'{}'); }catch(e){ return {}; } }
+function saveUserImgs(){ try{ localStorage.setItem(UIMGS_KEY, JSON.stringify(userImgs)); }catch(e){} }
+var userImgs = loadUserImgs();
+function picInner(id, svgFn){
+  var img = userImgs[id];
+  var body = img ? '<img class="userimg" src="'+img+'" alt="">' : svgFn();
+  return body + '<button class="photobtn" data-id="'+id+'" title="加入我嘅圖片" aria-label="加入圖片">📷</button>';
+}
+var _fileInput = document.createElement('input');
+_fileInput.type='file'; _fileInput.accept='image/*'; _fileInput.style.display='none';
+document.body.appendChild(_fileInput);
+var _uploadId = null;
+_fileInput.addEventListener('change', function(){
+  var file = _fileInput.files && _fileInput.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    var im = new Image();
+    im.onload = function(){
+      var max=360, w=im.width, h=im.height;
+      if(w>h && w>max){ h=Math.round(h*max/w); w=max; }
+      else if(h>max){ w=Math.round(w*max/h); h=max; }
+      var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      var ctx=cv.getContext&&cv.getContext('2d');
+      var url;
+      if(ctx){ ctx.drawImage(im,0,0,w,h); try{ url=cv.toDataURL('image/jpeg',0.72); }catch(e){ url=reader.result; } }
+      else { url=reader.result; }
+      userImgs[_uploadId]=url; saveUserImgs(); refreshCardPic(_uploadId);
+    };
+    im.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+  _fileInput.value='';
+});
+document.addEventListener('click', function(e){
+  var t = e.target; var b = (t && t.closest) ? t.closest('.photobtn') : null;
+  if(b){ _uploadId = b.getAttribute('data-id'); _fileInput.click(); }
+});
+function refreshCardPic(id){
+  var pic = document.querySelector('[data-pic="'+id+'"]');
+  if(pic && pic._svgFn) pic.innerHTML = picInner(id, pic._svgFn);
+  if(typeof renderBook==='function') renderBook();
+  if(curQ && curQ.type==='who' && curQ._fid===id && typeof renderQ==='function') renderQ();
+}
+/* ---------- 渲染：hero ---------- */
+(function(){
+  var svgFn = function(){ return drawCar({body:'#e32017', num:'95', lightning:true, kind:'racer'}); };
+  var el = document.getElementById('heroCar');
+  el.innerHTML = '<div class="pic" data-pic="hero" style="position:relative">'+picInner('hero', svgFn)+'</div>';
+  el.querySelector('.pic')._svgFn = svgFn;
+})();
+
+/* ---------- 渲染：形態 ---------- */
+(function(){
+  var g = document.getElementById('formsGrid');
+  forms.forEach(function(f){
+    var chips = f.learn.map(function(t){return '<span class="chip" style="background:'+ (t.indexOf('紅')>=0?'#e32017':t.indexOf('藍')>=0?'#1f4e9b':t.indexOf('灰')>=0?'#888':'#37b24d') +'">'+t+'</span>';}).join('');
+    var svgFn = function(){ return drawCar({body:f.body, num:f.num, lightning:f.lightning, headlight:f.headlight, kind:'racer'}); };
+    var div = document.createElement('div');
+    div.className='card';
+    div.innerHTML = '<div class="pic" data-pic="'+f.id+'">'+picInner(f.id, svgFn)+'</div>'
+      + '<span class="tag">'+f.movie+'</span>'
+      + '<h3>'+f.name+'</h3>'
+      + '<p class="en">'+f.en+'</p>'
+      + '<div>'+chips+'</div>';
+    g.appendChild(div);
+    div.querySelector('.pic')._svgFn = svgFn;
+  });
+})();
+
+/* ---------- 渲染：朋友 ---------- */
+(function(){
+  var g = document.getElementById('friendsGrid');
+  friends.forEach(function(fr){
+    var svgFn = function(){ return drawCar({body:fr.body, kind:fr.kind, num:''}); };
+    var div = document.createElement('div');
+    div.className='card';
+    div.innerHTML = '<div class="pic" data-pic="'+fr.id+'">'+picInner(fr.id, svgFn)+'</div>'
+      + '<h3>'+fr.name+'</h3>'
+      + '<p class="en">'+fr.en+'</p>'
+      + '<ul><li><b>係咩車：</b>'+fr.type+'</li>'
+      + '<li><b>同麥坤：</b>'+fr.rel+'</li>'
+      + '<li><b>趣趣：</b>'+fr.fact+'</li></ul>';
+    g.appendChild(div);
+    div.querySelector('.pic')._svgFn = svgFn;
+  });
+})();
+
+/* ================= 貼紙簿 + 遊戲 ================= */
+var STKEY = 'mcqueen_stickers_v1';
+function loadEarned(){ try{ var n = parseInt(localStorage.getItem(STKEY),10); return isNaN(n)?0:Math.min(n, forms.length); }catch(e){ return 0; } }
+function saveEarned(n){ try{ localStorage.setItem(STKEY, n); }catch(e){} }
+var earned = loadEarned();
+
+function renderBook(){
+  var box = document.getElementById('stickerBook');
+  box.innerHTML='';
+  forms.forEach(function(f, i){
+    var got = i < earned;
+    var d = document.createElement('div');
+    d.className = 'stk' + (got?'':' locked');
+    d.innerHTML = '<div class="frame">'+(userImgs[f.id] ? '<img class="userimg" src="'+userImgs[f.id]+'" alt="">' : drawCar({body:f.body, num:f.num, lightning:f.lightning, headlight:f.headlight, kind:'racer'}))+'</div>'
+      + '<div class="nm">'+(got? f.name : '未解鎖')+'</div>';
+    box.appendChild(d);
+  });
+  var pct = Math.round(earned/forms.length*100);
+  document.getElementById('progBar').style.width = pct+'%';
+  document.getElementById('progTxt').textContent = '已集 '+earned+' / '+forms.length+' 款 （'+pct+'%）';
+  var note = document.getElementById('bookNote');
+  if(earned >= forms.length){
+    note.innerHTML = '恭喜晒！你已經集齊整本麥坤貼紙簿，好叻呀！';
+  } else {
+    note.innerHTML = '再答啱 '+(forms.length-earned)+' 題，就可以集齊整本貼紙簿啦！';
+  }
+}
+document.getElementById('resetBtn').addEventListener('click', function(){
+  earned = 0; saveEarned(0); renderBook();
+});
+document.getElementById('resetImgsBtn').addEventListener('click', function(){
+  userImgs = {}; saveUserImgs();
+  forms.forEach(function(f){ var p=document.querySelector('[data-pic="'+f.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(f.id,p._svgFn); });
+  friends.forEach(function(fr){ var p=document.querySelector('[data-pic="'+fr.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(fr.id,p._svgFn); });
+  var hp=document.querySelector('[data-pic="hero"]'); if(hp&&hp._svgFn) hp.innerHTML=picInner('hero',hp._svgFn);
+  renderBook();
+});
+
+/* ---------- 題目庫 ---------- */
+function countQ(shape, n){
+  var sym = (shape==='star')? drawStar('#ffd21a') : drawTri('#37b24d');
+  var html=''; for(var i=0;i<n;i++) html+=sym;
+  // 4 個唔同嘅選項（答案 + 3 個干擾，範圍 1–9）
+  var opts = [n];
+  var cand = [];
+  for(var k=1;k<=9;k++){ if(k!==n) cand.push(k); }
+  cand.sort(function(){return Math.random()-0.5;});
+  opts = opts.concat(cand.slice(0,3));
+  return {
+    type:'count', symbol:true,
+    text: (shape==='star'? '數數有幾多粒星？' : '數數有幾多個三角形？'),
+    symbols: html,
+    answer: n,
+    opts: opts
+  };
+}
+function patternQ(){
+  return {
+    type:'pattern', symbol:true,
+    text:'跟住規律：星、三角、星、三角、星、？ 跟住係咩？',
+    symbols: drawStar('#ffd21a')+drawTri('#37b24d')+drawStar('#ffd21a')+drawTri('#37b24d')+drawStar('#ffd21a'),
+    answer:'triangle',
+    opts:['star','triangle']
+  };
+}
+function whoQ(){
+  var fr = friends[Math.floor(Math.random()*friends.length)];
+  var others = friends.filter(function(x){return x!==fr;}).sort(function(){return Math.random()-0.5;}).slice(0,2);
+  var opts = [fr].concat(others).sort(function(){return Math.random()-0.5;});
+  var carSvg = userImgs[fr.id]
+    ? '<img class="quserimg" src="'+userImgs[fr.id]+'" alt="">'
+    : drawCar({body:fr.body, kind:fr.kind, num:''});
+  return {
+    type:'who', car:true, carSvg: carSvg, _fid: fr.id,
+    text:'呢架車係邊個角色？',
+    answer: fr.name,
+    opts: opts.map(function(o){return o.name;})
+  };
+}
+function colorQ(){
+  return {
+    type:'choice',
+    text:'麥坤係咩顏色？',
+    answer:'紅色 red',
+    opts:['紅色 red','藍色 blue','黃色 yellow']
+  };
+}
+function numberQ(){
+  return {
+    type:'choice',
+    text:'麥坤嘅車號係幾多？',
+    answer:'95',
+    opts:['95','23','8','3']
+  };
+}
+/* ---------- 比例推理題：1 粒星 = k 個正方形，如此類推 ---------- */
+var PAIRS = [
+  {a:'star',    b:'square',   k:2},
+  {a:'triangle',b:'circle',   k:2},
+  {a:'heart',   b:'star',     k:2},
+  {a:'circle',  b:'triangle', k:3},
+  {a:'square',  b:'heart',    k:2},
+  {a:'diamond', b:'square',   k:2},
+  {a:'star',    b:'circle',   k:2},
+  {a:'triangle',b:'square',   k:2},
+  {a:'circle',  b:'diamond',  k:2},
+  {a:'square',  b:'triangle', k:2}
+];
+function ratioQ(){
+  var p = PAIRS[Math.floor(Math.random()*PAIRS.length)];
+  var k = p.k;
+  // 難度：大多 1–5 粒；k=2 時約 30% 去到 6–10；k=3 封頂 5 以防太難
+  var n;
+  if(k>=3){ n = 1 + Math.floor(Math.random()*5); }
+  else { n = (Math.random()<0.3)? (6 + Math.floor(Math.random()*5)) : (1 + Math.floor(Math.random()*5)); }
+  var answer = n*k;
+  var sa = SHAPE[p.a], sb = SHAPE[p.b];
+  function row(nStars, nSq){
+    var stars=''; for(var i=0;i<nStars;i++) stars += sa.draw(sa.color);
+    var rhs;
+    if(nSq===null){ rhs = '<span class="qmark">?</span>'; }
+    else { rhs=''; for(var j=0;j<nSq;j++) rhs += sb.draw(sb.color); }
+    return '<div class="prow"><div class="prow-l">'+stars+'</div><div class="peq">=</div><div class="prow-r">'+rhs+'</div></div>';
+  }
+  var symbols = row(1,k) + row(2,k*2) + row(n,null);
+  // 選項：答案 + 3 個相近干擾（含「淨數星數」呢個常見錯誤）
+  var cand=[];
+  function add(x){ if(x>0 && x!==answer && cand.indexOf(x)<0) cand.push(x); }
+  add(n); add(answer-1); add(answer+1); add(answer-2); add(answer+2); add(n+1); add(n+k);
+  while(cand.length<3){ var r=1+Math.floor(Math.random()*Math.max(20,answer+6)); add(r); }
+  cand.push(answer);
+  // 英文句子
+  var en = numWord[1]+' '+plEN(sa.en,1)+' '+vbEN(1)+' '+k+' '+plEN(sb.en,k)+'. '
+         + numWord[2]+' '+plEN(sa.en,2)+' '+vbEN(2)+' '+(k*2)+' '+plEN(sb.en,k*2)+'. '
+         + numWord[n]+' '+plEN(sa.en,n)+' '+vbEN(n)+' equal how many '+plEN(sb.en,2)+'?';
+  return {
+    type:'ratio', ratio:true, symbol:true,
+    text:'跟住數：'+n+sa.zh+' 係幾多個'+sb.zh+'？',
+    sub:'1'+sa.zh+' = '+k+sb.zh+'，2'+sa.zh+' = '+(k*2)+sb.zh+'，'+n+sa.zh+' = ?'+sb.zh,
+    symbols: symbols,
+    answer: answer,
+    opts: cand.sort(function(){return Math.random()-0.5;}),
+    en: en
+  };
+}
+var builders = [
+  ratioQ, ratioQ, ratioQ, ratioQ, ratioQ, ratioQ, ratioQ, ratioQ,  // 比例推理（主力）
+  whoQ, colorQ, numberQ,                                            // 麥坤角色/事實（保留）
+  function(){return countQ('star', 1+Math.floor(Math.random()*4));},
+  function(){return countQ('triangle', 1+Math.floor(Math.random()*4));}
+];
+var qOrder = [];
+function refill(){
+  qOrder = [];
+  for(var i=0;i<builders.length;i++) qOrder.push(i);
+  qOrder.sort(function(){return Math.random()-0.5;});
+}
+var qIdx = 0;
+var curQ = null;
+function nextQ(){
+  if(qIdx >= qOrder.length){ refill(); qIdx = 0; }
+  curQ = builders[qOrder[qIdx]]();
+  qIdx++;
+  renderQ();
+}
+function renderQ(){
+  var box = document.getElementById('quizBox');
+  var h = '';
+  h += '<div class="qtext">'+curQ.text+'</div>';
+  if(curQ.ratio){
+    h += '<div class="ratio-box">'+curQ.symbols+'</div>';
+    if(curQ.sub){ h += '<div class="qsub">'+curQ.sub+'</div>'; }
+  } else if(curQ.symbol){
+    h += '<div class="symbols">'+curQ.symbols+'</div>';
+  }
+  if(curQ.car){ h += '<div class="qcar">'+curQ.carSvg+'</div>'; }
+  if(curQ.en){ h += '<button class="speak-btn" id="speakBtn">🔊 聽英文</button>'; }
+  // options: shuffle
+  var opts = curQ.opts.slice().sort(function(){return Math.random()-0.5;});
+  var optHtml = opts.map(function(o){
+    return '<button class="opt" data-v="'+o+'">'+o+'</button>';
+  }).join('');
+  h += '<div class="opts" id="optBox">'+optHtml+'</div>';
+  h += '<div class="feedback" id="fb"></div>';
+  h += '<button class="nextbtn" id="nextBtn" style="display:none">下一題</button>';
+  box.innerHTML = h;
+
+  var optBox = document.getElementById('optBox');
+  optBox.querySelectorAll('.opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(optBox.dataset.done) return;
+      optBox.dataset.done = '1';
+      var v = btn.getAttribute('data-v');
+      var correct = (v === String(curQ.answer));
+      if(correct){
+        btn.classList.add('correct');
+        onCorrect();
+      } else {
+        btn.classList.add('wrong');
+        // show correct one
+        optBox.querySelectorAll('.opt').forEach(function(b){
+          if(b.getAttribute('data-v') === String(curQ.answer)) b.classList.add('correct');
+        });
+        var fb = document.getElementById('fb');
+        fb.className='feedback bad'; fb.textContent='差少少，再試過啦！';
+        speakEN('Try again!');
+      }
+      document.getElementById('nextBtn').style.display='block';
+    });
+  });
+  var sbBtn = document.getElementById('speakBtn');
+  if(sbBtn){ sbBtn.addEventListener('click', function(){ speakEN(curQ.en); }); }
+  document.getElementById('nextBtn').addEventListener('click', function(){ nextQ(); });
+}
+function onCorrect(){
+  speakEN('Great job! You got a sticker!');
+  var fb = document.getElementById('fb');
+  if(earned < forms.length){
+    var idx = earned;
+    earned++; saveEarned(earned);
+    fb.className='feedback good';
+    fb.innerHTML = '答啱啦！得咗一張麥坤貼紙！';
+    // show the earned sticker
+    var stk = '<div class="get-sticker">'+drawCar({body:forms[idx].body, num:forms[idx].num, lightning:forms[idx].lightning, headlight:forms[idx].headlight, kind:'racer'})+'</div>';
+    fb.insertAdjacentHTML('afterend', stk);
+    renderBook();
+  } else {
+    fb.className='feedback good';
+    fb.textContent='答啱啦！貼紙簿已經集齊晒，好叻！';
+    renderBook();
+  }
+}
+
+/* init */
+renderBook();
+refill();
+nextQ();
+</script>
+</body>
+</html>
