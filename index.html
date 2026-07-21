@@ -202,7 +202,7 @@
         <button class="resetbtn" id="resetImgsBtn">重設我嘅圖片（家長用）</button>
         <div class="sync-panel" style="margin-top:14px;border-top:2px dashed var(--line);padding-top:12px;">
           <div style="font-weight:800;color:#7a6647;">📡 我嘅圖片同步（電腦 ↔ iPad）</div>
-          <p style="font-size:13px;color:#9a8a6c;margin:6px 0 8px;">加一次，兩邊都見到。圖會存去匿名雲端（jsonblob，同你個 family-reminder 一樣），唔會跟 link 出街；但知個網址就睇到，所以唔適合放仔嘅私相。想 100% 私存就用下面「匯出 / 匯入」。</p>
+          <p style="font-size:13px;color:#9a8a6c;margin:6px 0 8px;">官方角色圖已經預載（開 link 自動載入，電腦 / iPad 都見到）。你加嘅私人相只留喺部機，唔出街；想喺另一部機見到就用下面「匯出 / 匯入」搬檔。官方角色圖放去匿名雲端（dpaste，唔會跟 link 出街，但知個網址就睇到），所以唔適合放仔嘅私相。</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="resetbtn" id="syncBtn">🔄 立即同步</button>
             <button class="resetbtn" id="exportBtn">⬇️ 匯出圖片</button>
@@ -221,9 +221,9 @@
   </section>
 
   <footer>
-    麥坤圖鑑小學堂 · 原創 SVG 插畫，無使用迪士尼／Pixar 圖像，純屬教育用途。<br>
-    想用返電影原版角色，撳每張圖右上角 📷 加入你自己的圖片。電腦加咗，iPad 開 link 會自動同步見到；<br>
-    圖預設存去匿名雲端（jsonblob）做跨裝置同步，唔會跟 link 出街，但知個網址就睇到 —— 唔適合放仔嘅私相。<br>
+    麥坤圖鑑小學堂 · 原創 SVG 插畫；官方角色圖來自迪士尼／Pixar 電影，已預載入 app，純屬屋企教育用途、唔外傳。<br>
+    想用返電影原版角色，開 link 已經自動載入；你想加自己嘅相，撳每張圖右上角 📷，相只留喺部機。<br>
+    官方角色圖放去匿名雲端（dpaste）做跨裝置同步，唔會跟 link 出街，但知個網址就睇到 —— 唔適合放仔嘅私相。<br>
     想 100% 私存就撳「匯出圖片」download 個 JSON，喺另一部機撳「匯入圖片」揀返個檔。適合 3–8 歲親子共玩，對準升小面試準備。
   </footer>
 
@@ -370,10 +370,9 @@ var friends = [
 
 /* ---------- 用家自訂圖片（可雲端同步 + 匯出/匯入，私隱見 footer） ---------- */
 var UIMGS_KEY = 'mcqueen_user_imgs_v2';
-// 雲端同步 blob（匿名 jsonblob，同你個 family-reminder 一樣；圖以 base64 存）
+// 官方角色圖 seed（匿名 dpaste，不可改；圖以 base64 存，app 開網頁自動 pull，任何裝置都見到）
 
-var BLOB_ID = '019f8313-bdcc-7309-9625-5c81d37b0480';
-var BLOB_URL = 'https://jsonblob.com/api/jsonBlob/' + BLOB_ID;
+var SEED_URL = 'https://dpaste.com/9265R49KH.txt';
 
 function loadUserImgs(){
   try{
@@ -401,22 +400,13 @@ function delImg(id){ delete userImgs[id]; saveUserImgs(); }
 var _syncing = false;
 function setSyncStatus(txt){ var el=document.getElementById('syncStatus'); if(el) el.textContent=txt; }
 function pushToCloud(){
-  if(_syncing) return Promise.resolve(false);
-  _syncing = true; setSyncStatus('同步中…');
-  return fetch(BLOB_URL, { method:'PUT', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({v:1, images: userImgs, ts: Date.now()}) })
-    .then(function(r){ return r.ok; })
-    .then(function(ok){
-      _syncing=false;
-      if(ok){ setSyncStatus('已同步 ✓ '+new Date().toLocaleTimeString()); }
-      else { setSyncStatus('同步失敗，下次再試'); }
-      return ok;
-    })
-    .catch(function(){ _syncing=false; setSyncStatus('同步失敗（冇網？）'); return false; });
+  // 雲端 seed 係不可改（dpaste），用家私人圖片只留部機 + 匯出/匯入，所以唔做雲推送
+  return Promise.resolve(true);
 }
 function pullFromCloud(){
-  return fetch(BLOB_URL, { headers:{'Accept':'application/json'} })
-    .then(function(r){ if(!r.ok) throw new Error('no'); return r.json(); })
+  return fetch(SEED_URL, { headers:{'Accept':'application/json'} })
+    .then(function(r){ if(!r.ok) throw new Error('no'); return r.text(); })
+    .then(function(txt){ return JSON.parse(txt); })
     .then(function(data){
       var imgs = (data && data.images) ? data.images : {};
       var changed=false;
@@ -557,12 +547,10 @@ document.getElementById('resetBtn').addEventListener('click', function(){
 });
 document.getElementById('resetImgsBtn').addEventListener('click', function(){
   userImgs = {}; saveUserImgs();
-  pushToCloud();
-  forms.forEach(function(f){ var p=document.querySelector('[data-pic="'+f.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(f.id,p._svgFn); });
-  friends.forEach(function(fr){ var p=document.querySelector('[data-pic="'+fr.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(fr.id,p._svgFn); });
-  var hp=document.querySelector('[data-pic="hero"]'); if(hp&&hp._svgFn) hp.innerHTML=picInner('hero',hp._svgFn);
-  renderBook();
-  setSyncStatus('已清空所有圖片並同步 ✓');
+  pullFromCloud().then(function(){
+    refreshAllPics();
+    setSyncStatus('已清空你加嘅圖片，官方角色圖保留 ✓');
+  });
 });
 
 /* ---------- 同步 / 匯出 / 匯入 按鈕 ---------- */
@@ -809,10 +797,10 @@ function onCorrect(){
 renderBook();
 refill();
 nextQ();
-// 開 app 自動從雲端拉一次圖片
+// 開 app 自動從雲端 seed 載入官方角色圖
 pullFromCloud().then(function(changed){
-  if(changed){ refreshAllPics(); setSyncStatus('已從雲端同步 ✓ '+new Date().toLocaleTimeString()); }
-  else { setSyncStatus('已係最新 ✓'); }
+  if(changed){ refreshAllPics(); setSyncStatus('已載入官方角色圖 ✓ '+new Date().toLocaleTimeString()); }
+  else { setSyncStatus('官方角色圖已就位 ✓'); }
 });
 </script>
 </body>
