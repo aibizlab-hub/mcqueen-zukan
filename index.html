@@ -199,8 +199,19 @@
       <div class="stickers" id="stickerBook"></div>
       <div class="badge-note" id="bookNote"></div>
       <button class="resetbtn" id="resetBtn">重設貼紙簿（家長用）</button>
-      <button class="resetbtn" id="resetImgsBtn">重設我嘅圖片（家長用）</button>
-    </div>
+        <button class="resetbtn" id="resetImgsBtn">重設我嘅圖片（家長用）</button>
+        <div class="sync-panel" style="margin-top:14px;border-top:2px dashed var(--line);padding-top:12px;">
+          <div style="font-weight:800;color:#7a6647;">📡 我嘅圖片同步（電腦 ↔ iPad）</div>
+          <p style="font-size:13px;color:#9a8a6c;margin:6px 0 8px;">加一次，兩邊都見到。圖會存去匿名雲端（jsonblob，同你個 family-reminder 一樣），唔會跟 link 出街；但知個網址就睇到，所以唔適合放仔嘅私相。想 100% 私存就用下面「匯出 / 匯入」。</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="resetbtn" id="syncBtn">🔄 立即同步</button>
+            <button class="resetbtn" id="exportBtn">⬇️ 匯出圖片</button>
+            <button class="resetbtn" id="importBtn">⬆️ 匯入圖片</button>
+          </div>
+          <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+          <div id="syncStatus" style="font-size:13px;margin-top:6px;color:#7a6647;">開 app 會自動同步</div>
+        </div>
+      </div>
   </section>
 
   <section id="quiz">
@@ -211,8 +222,9 @@
 
   <footer>
     麥坤圖鑑小學堂 · 原創 SVG 插畫，無使用迪士尼／Pixar 圖像，純屬教育用途。<br>
-    想用返電影原版角色，撳每張圖右上角 📷 加入你自己的圖片（只留喺呢部機，唔上傳、唔外傳，純個人屋企用）。<br>
-    適合 3–8 歲親子共玩，對準升小面試準備。
+    想用返電影原版角色，撳每張圖右上角 📷 加入你自己的圖片。電腦加咗，iPad 開 link 會自動同步見到；<br>
+    圖預設存去匿名雲端（jsonblob）做跨裝置同步，唔會跟 link 出街，但知個網址就睇到 —— 唔適合放仔嘅私相。<br>
+    想 100% 私存就撳「匯出圖片」download 個 JSON，喺另一部機撳「匯入圖片」揀返個檔。適合 3–8 歲親子共玩，對準升小面試準備。
   </footer>
 
 </div>
@@ -356,13 +368,79 @@ var friends = [
   {id:'storm', name:'積遜暴風', en:'Jackson Storm', type:'黑藍跑車', body:'#222a44', kind:'racer', rel:'新對手', fact:'好快好叻嘅新車'}
 ];
 
-/* ---------- 用家自訂圖片（個人使用，圖留喺部機，永不上傳） ---------- */
-var UIMGS_KEY = 'mcqueen_user_imgs_v1';
-function loadUserImgs(){ try{ return JSON.parse(localStorage.getItem(UIMGS_KEY)||'{}'); }catch(e){ return {}; } }
+/* ---------- 用家自訂圖片（可雲端同步 + 匯出/匯入，私隱見 footer） ---------- */
+var UIMGS_KEY = 'mcqueen_user_imgs_v2';
+// 雲端同步 blob（匿名 jsonblob，同你個 family-reminder 一樣；圖以 base64 存）
+
+var BLOB_ID = '019f8313-bdcc-7309-9625-5c81d37b0480';
+var BLOB_URL = 'https://jsonblob.com/api/jsonBlob/' + BLOB_ID;
+
+function loadUserImgs(){
+  try{
+    var obj = JSON.parse(localStorage.getItem(UIMGS_KEY)||'{}');
+    var out = {};
+    for(var k in obj){ if(!obj.hasOwnProperty(k)) continue;
+      // 兼容舊格式 {id: dataURL}
+      if(typeof obj[k]==='string'){ out[k]={d:obj[k], t:0}; }
+      else { out[k]=obj[k]; }
+    }
+    return out;
+  }catch(e){ return {}; }
+}
 function saveUserImgs(){ try{ localStorage.setItem(UIMGS_KEY, JSON.stringify(userImgs)); }catch(e){} }
 var userImgs = loadUserImgs();
+
+// 取圖 dataURL
+function imgData(id){ return (userImgs[id] && userImgs[id].d) ? userImgs[id].d : null; }
+// 設圖（更新 timestamp，用嚟決定邊邊新）
+function setImg(id, dataURL){ userImgs[id] = { d: dataURL, t: Date.now() }; saveUserImgs(); }
+// 刪圖
+function delImg(id){ delete userImgs[id]; saveUserImgs(); }
+
+/* ---- 雲端同步（按 timestamp 合併，唔會互蓋） ---- */
+var _syncing = false;
+function setSyncStatus(txt){ var el=document.getElementById('syncStatus'); if(el) el.textContent=txt; }
+function pushToCloud(){
+  if(_syncing) return Promise.resolve(false);
+  _syncing = true; setSyncStatus('同步中…');
+  return fetch(BLOB_URL, { method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({v:1, images: userImgs, ts: Date.now()}) })
+    .then(function(r){ return r.ok; })
+    .then(function(ok){
+      _syncing=false;
+      if(ok){ setSyncStatus('已同步 ✓ '+new Date().toLocaleTimeString()); }
+      else { setSyncStatus('同步失敗，下次再試'); }
+      return ok;
+    })
+    .catch(function(){ _syncing=false; setSyncStatus('同步失敗（冇網？）'); return false; });
+}
+function pullFromCloud(){
+  return fetch(BLOB_URL, { headers:{'Accept':'application/json'} })
+    .then(function(r){ if(!r.ok) throw new Error('no'); return r.json(); })
+    .then(function(data){
+      var imgs = (data && data.images) ? data.images : {};
+      var changed=false;
+      for(var id in imgs){ if(!imgs.hasOwnProperty(id)) continue;
+        var cloud = imgs[id];
+        var local = userImgs[id];
+        var cloudT = (cloud && cloud.t) ? cloud.t : 0;
+        var localT = (local && local.t) ? local.t : 0;
+        if(!local || cloudT >= localT){ userImgs[id]=cloud; changed=true; }
+      }
+      if(changed){ saveUserImgs(); }
+      return changed;
+    })
+    .catch(function(){ return false; });
+}
+function refreshAllPics(){
+  forms.forEach(function(f){ var p=document.querySelector('[data-pic="'+f.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(f.id,p._svgFn); });
+  friends.forEach(function(fr){ var p=document.querySelector('[data-pic="'+fr.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(fr.id,p._svgFn); });
+  var hp=document.querySelector('[data-pic="hero"]'); if(hp&&hp._svgFn) hp.innerHTML=picInner('hero',hp._svgFn);
+  renderBook();
+}
+
 function picInner(id, svgFn){
-  var img = userImgs[id];
+  var img = imgData(id);
   var body = img ? '<img class="userimg" src="'+img+'" alt="">' : svgFn();
   return body + '<button class="photobtn" data-id="'+id+'" title="加入我嘅圖片" aria-label="加入圖片">📷</button>';
 }
@@ -384,7 +462,9 @@ _fileInput.addEventListener('change', function(){
       var url;
       if(ctx){ ctx.drawImage(im,0,0,w,h); try{ url=cv.toDataURL('image/jpeg',0.72); }catch(e){ url=reader.result; } }
       else { url=reader.result; }
-      userImgs[_uploadId]=url; saveUserImgs(); refreshCardPic(_uploadId);
+      setImg(_uploadId, url);
+      refreshCardPic(_uploadId);
+      pushToCloud();
     };
     im.src = reader.result;
   };
@@ -458,7 +538,7 @@ function renderBook(){
     var got = i < earned;
     var d = document.createElement('div');
     d.className = 'stk' + (got?'':' locked');
-    d.innerHTML = '<div class="frame">'+(userImgs[f.id] ? '<img class="userimg" src="'+userImgs[f.id]+'" alt="">' : drawCar({body:f.body, num:f.num, lightning:f.lightning, headlight:f.headlight, kind:'racer'}))+'</div>'
+    d.innerHTML = '<div class="frame">'+(imgData(f.id) ? '<img class="userimg" src="'+imgData(f.id)+'" alt="">' : drawCar({body:f.body, num:f.num, lightning:f.lightning, headlight:f.headlight, kind:'racer'}))+'</div>'
       + '<div class="nm">'+(got? f.name : '未解鎖')+'</div>';
     box.appendChild(d);
   });
@@ -477,11 +557,58 @@ document.getElementById('resetBtn').addEventListener('click', function(){
 });
 document.getElementById('resetImgsBtn').addEventListener('click', function(){
   userImgs = {}; saveUserImgs();
+  pushToCloud();
   forms.forEach(function(f){ var p=document.querySelector('[data-pic="'+f.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(f.id,p._svgFn); });
   friends.forEach(function(fr){ var p=document.querySelector('[data-pic="'+fr.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(fr.id,p._svgFn); });
   var hp=document.querySelector('[data-pic="hero"]'); if(hp&&hp._svgFn) hp.innerHTML=picInner('hero',hp._svgFn);
   renderBook();
+  setSyncStatus('已清空所有圖片並同步 ✓');
 });
+
+/* ---------- 同步 / 匯出 / 匯入 按鈕 ---------- */
+document.getElementById('syncBtn').addEventListener('click', function(){
+  setSyncStatus('同步中…');
+  pullFromCloud().then(function(changed){
+    if(changed){ refreshAllPics(); setSyncStatus('已從雲端更新 ✓ '+new Date().toLocaleTimeString()); }
+    else { setSyncStatus('已係最新 ✓'); }
+    return pushToCloud();
+  });
+});
+document.getElementById('exportBtn').addEventListener('click', function(){
+  try{
+    var blob = new Blob([JSON.stringify(userImgs)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'mcqueen-images.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setSyncStatus('已匯出 mcqueen-images.json（私存落部機）');
+  }catch(e){ setSyncStatus('匯出失敗'); }
+});
+var _importFile = document.getElementById('importFile');
+document.getElementById('importBtn').addEventListener('click', function(){ if(_importFile) _importFile.click(); });
+if(_importFile){ _importFile.addEventListener('change', function(){
+  var file = _importFile.files && _importFile.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var obj = JSON.parse(reader.result);
+      var n=0;
+      for(var id in obj){ if(!obj.hasOwnProperty(id)) continue;
+        var v = obj[id];
+        if(typeof v==='string'){ v={d:v,t:0}; }
+        var localT = (userImgs[id]&&userImgs[id].t)?userImgs[id].t:0;
+        var impT = v.t||0;
+        if(impT>=localT){ userImgs[id]=v; n++; }
+      }
+      saveUserImgs();
+      refreshAllPics();
+      pushToCloud();
+      setSyncStatus('已匯入 '+n+' 張圖 ✓');
+    }catch(e){ setSyncStatus('匯入失敗：檔案唔啱'); }
+  };
+  reader.readAsText(file);
+  _importFile.value='';
+}); }
 
 /* ---------- 題目庫 ---------- */
 function countQ(shape, n){
@@ -514,8 +641,8 @@ function whoQ(){
   var fr = friends[Math.floor(Math.random()*friends.length)];
   var others = friends.filter(function(x){return x!==fr;}).sort(function(){return Math.random()-0.5;}).slice(0,2);
   var opts = [fr].concat(others).sort(function(){return Math.random()-0.5;});
-  var carSvg = userImgs[fr.id]
-    ? '<img class="quserimg" src="'+userImgs[fr.id]+'" alt="">'
+  var carSvg = imgData(fr.id)
+    ? '<img class="quserimg" src="'+imgData(fr.id)+'" alt="">'
     : drawCar({body:fr.body, kind:fr.kind, num:''});
   return {
     type:'who', car:true, carSvg: carSvg, _fid: fr.id,
@@ -682,6 +809,11 @@ function onCorrect(){
 renderBook();
 refill();
 nextQ();
+// 開 app 自動從雲端拉一次圖片
+pullFromCloud().then(function(changed){
+  if(changed){ refreshAllPics(); setSyncStatus('已從雲端同步 ✓ '+new Date().toLocaleTimeString()); }
+  else { setSyncStatus('已係最新 ✓'); }
+});
 </script>
 </body>
 </html>
