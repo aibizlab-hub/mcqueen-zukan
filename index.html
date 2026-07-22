@@ -210,7 +210,8 @@
         <button class="resetbtn" id="resetImgsBtn">重設我嘅圖片（家長用）</button>
         <div class="sync-panel" style="margin-top:14px;border-top:2px dashed var(--line);padding-top:12px;">
           <div style="font-weight:800;color:#7a6647;">📡 我嘅圖片同步（電腦 ↔ iPad）</div>
-          <p style="font-size:13px;color:#9a8a6c;margin:6px 0 8px;">官方角色圖已經預載（開 link 自動載入，電腦 / iPad 都見到）。你加嘅私人相只留喺部機，唔出街；想喺另一部機見到就用下面「匯出 / 匯入」搬檔。官方角色圖放去匿名雲端（dpaste，唔會跟 link 出街，但知個網址就睇到），所以唔適合放仔嘅私相。</p>
+          <p style="font-size:13px;color:#9a8a6c;margin:6px 0 8px;">你加嘅私人相而家會<b>自動同步</b>去匿名雲端（dpaste 相片 + jsonblob pointer，同官方圖同級別），電腦 / iPad / 電話開 app 都自動見到，唔使再匯出/匯入。相只經匿名雲、唔跟 link 出街；想 100% 私存就關下面開關，改用匯出/匯入。</p>
+          <label style="font-size:13px;color:#7a6647;display:flex;align-items:center;gap:6px;margin:2px 0 6px;cursor:pointer;"><input type="checkbox" id="syncToggle" checked> 自動雲端同步（私人相）</label>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button class="resetbtn" id="syncBtn">🔄 立即同步</button>
             <button class="resetbtn" id="exportBtn">⬇️ 匯出圖片</button>
@@ -231,7 +232,7 @@
   <footer>
     麥坤圖鑑小學堂 · 原創 SVG 插畫；官方角色圖來自迪士尼／Pixar 電影，已預載入 app，純屬屋企教育用途、唔外傳。<br>
     想用返電影原版角色，開 link 已經自動載入；你想加自己嘅相，撳每張圖右上角 📷，相只留喺部機。<br>
-    官方角色圖放去匿名雲端（dpaste）做跨裝置同步，唔會跟 link 出街，但知個網址就睇到 —— 唔適合放仔嘅私相。<br>
+    你加嘅私人相經匿名雲端（dpaste + jsonblob）自動同步，電腦/iPad/電話開 app 都見到；想 100% 私存就關同步開關，或撳「匯出圖片」。<br>
     想 100% 私存就撳「匯出圖片」download 個 JSON，喺另一部機撳「匯入圖片」揀返個檔。適合 3–8 歲親子共玩，對準升小面試準備。
   </footer>
 
@@ -593,15 +594,54 @@ function loadUserImgs(){
 function saveUserImgs(){ try{ localStorage.setItem(UIMGS_KEY, JSON.stringify(userImgs)); }catch(e){} }
 var userImgs = loadUserImgs();
 function imgData(id){ return (userImgs[id] && userImgs[id].d) ? userImgs[id].d : null; }
-function setImg(id, dataURL){ userImgs[id] = { d: dataURL, t: Date.now() }; saveUserImgs(); }
-function delImg(id){ delete userImgs[id]; saveUserImgs(); }
+function setImg(id, dataURL){ userImgs[id] = { d: dataURL, t: Date.now() }; saveUserImgs(); schedulePush(); }
+function delImg(id){ delete userImgs[id]; saveUserImgs(); schedulePush(); }
 
-/* ---- 雲端同步（按 timestamp 合併，唔會互蓋） ---- */
+/* ---- 雲端同步（零 token：私人相放 dpaste 新 paste，pointer 放 jsonblob；按 ts 合併） ---- */
+var SYNC_BLOB_ID = '019f8a40-1b4d-7daf-afcd-eec154166e8c'; // jsonblob pointer（只存最新相片 paste URL）
+var SYNC_ON = (localStorage.getItem('mcqueen_sync_on') !== '0'); // 預設開（'0' 先關）
 var _syncing = false;
+var _pushTimer = null;
 function setSyncStatus(txt){ var el=document.getElementById('syncStatus'); if(el) el.textContent=txt; }
-function pushToCloud(){
-  return Promise.resolve(true);
+
+// 讀 pointer → 攞最新相片 paste URL
+function readPointer(){
+  return fetch('https://jsonblob.com/api/jsonBlob/'+SYNC_BLOB_ID, { headers:{'Accept':'application/json'} })
+    .then(function(r){ if(!r.ok) throw new Error('nop'); return r.json(); })
+    .catch(function(){ return null; });
 }
+// 寫 pointer（CORS PUT，瀏覽器可寫）
+function writePointer(url, ts){
+  return fetch('https://jsonblob.com/api/jsonBlob/'+SYNC_BLOB_ID, {
+    method:'PUT',
+    headers:{'Content-Type':'application/json','X-jsonblob-id':SYNC_BLOB_ID},
+    body: JSON.stringify({url:url, ts:ts})
+  }).then(function(r){ return r.ok; }).catch(function(){ return false; });
+}
+// 讀一個 dpaste 相片 paste
+function fetchPaste(url){
+  return fetch(url, { headers:{'Accept':'application/json'} })
+    .then(function(r){ if(!r.ok) throw new Error('no'); return r.text(); })
+    .then(function(txt){ return JSON.parse(txt); })
+    .catch(function(){ return null; });
+}
+// 將雲端相片 merge 入 userImgs（per-id 新 ts 贏，唔會互蓋）
+function mergeCloudImages(data){
+  if(!data || !data.images) return false;
+  var im = data.images, changed=false;
+  for(var id in im){ if(!im.hasOwnProperty(id)) continue;
+    var cloud = im[id];
+    if(typeof cloud === 'string'){ cloud = {d: cloud, t:0}; }
+    var local = userImgs[id];
+    var cloudT = (cloud && cloud.t) ? cloud.t : 0;
+    var localT = (local && local.t) ? local.t : 0;
+    if(!local || cloudT >= localT){ userImgs[id]=cloud; changed=true; }
+  }
+  if(userImgs['mq_classic'] && !userImgs['hero']) userImgs['hero']=userImgs['mq_classic'];
+  return changed;
+}
+
+// 拉雲端：官方 seed（原有）+ 私人相 pointer→paste（新增）
 function pullFromCloud(){
   var proms = SEED_URLS.map(function(u){
     return fetch(u, { headers:{'Accept':'application/json'} })
@@ -609,24 +649,72 @@ function pullFromCloud(){
       .then(function(txt){ return JSON.parse(txt); })
       .catch(function(){ return null; });
   });
-  return Promise.all(proms).then(function(list){
+  var privateProm = readPointer().then(function(ptr){
+    if(!ptr || !ptr.url) return null;
+    return fetchPaste(ptr.url);
+  });
+  return Promise.all(proms.concat([privateProm])).then(function(list){
     var changed=false;
-    list.forEach(function(data){
-      if(!data || !data.images) return;
-      var imgs = data.images;
-      for(var id in imgs){ if(!imgs.hasOwnProperty(id)) continue;
-        var cloud = imgs[id];
-        if(typeof cloud === 'string'){ cloud = {d: cloud, t: 0}; }
-        var local = userImgs[id];
-        var cloudT = (cloud && cloud.t) ? cloud.t : 0;
-        var localT = (local && local.t) ? local.t : 0;
-        if(!local || cloudT >= localT){ userImgs[id]=cloud; changed=true; }
-      }
-    });
-    if(userImgs['mq_classic'] && !userImgs['hero']) userImgs['hero']=userImgs['mq_classic'];
+    list.forEach(function(data){ if(mergeCloudImages(data)) changed=true; });
     if(changed){ saveUserImgs(); }
     return changed;
   });
+}
+
+// 推雲端：先拉其他人嘅相 merge（避免互蓋），再 POST 新 dpaste paste，更新 pointer
+function pushToCloud(attempt){
+  if(!SYNC_ON) return Promise.resolve(false);
+  if(_syncing) return Promise.resolve(false);
+  _syncing = true;
+  attempt = attempt || 1;
+  setSyncStatus('同步中…');
+  return pullFromCloud().then(function(){
+    var payload = JSON.stringify({ v:1, images: userImgs });
+    return fetch('https://dpaste.com/api/v2/', {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json'},
+      body: 'content=' + encodeURIComponent(payload)
+    });
+  }).then(function(r){
+    if(!r.ok){
+      if(r.status===429 && attempt<3){ throw new Error('429'); }
+      throw new Error('post '+r.status);
+    }
+    var url = r.headers.get('location');
+    if(url) return url;
+    return r.text().then(function(txt){
+      var m = txt.match(/https?:\/\/dpaste\.com\/[A-Za-z0-9]+/);
+      if(m) return m[0];
+      try{ var j=JSON.parse(txt); if(j&&j.url) return j.url; }catch(e){}
+      return null;
+    });
+  }).then(function(rawUrl){
+    if(!rawUrl) throw new Error('no-url');
+    var finalUrl = (rawUrl.indexOf('.txt')>=0) ? rawUrl : (rawUrl.replace(/\/$/,'')+'.txt');
+    var ts = Date.now();
+    return writePointer(finalUrl, ts).then(function(ok){
+      _syncing = false;
+      if(ok){ setSyncStatus('已同步 ✓ '+Object.keys(userImgs).length+' 張 '+new Date().toLocaleTimeString()); }
+      else { setSyncStatus('相已上載，但 pointer 更新失敗，撳「立即同步」再試'); }
+      return ok;
+    });
+  }).catch(function(err){
+    _syncing = false;
+    var msg = (err && err.message) || '';
+    if(msg.indexOf('429')>=0 && attempt<3){
+      setSyncStatus('同步節流中，'+(3*attempt)+'秒後重試…');
+      return new Promise(function(res){ setTimeout(function(){ res(pushToCloud(attempt+1)); }, 3000*attempt); });
+    }
+    setSyncStatus('同步失敗（'+msg+'）— 可撳「立即同步」或匯出/匯入');
+    return Promise.resolve(false);
+  });
+}
+
+// 防 debris：加/刪相後 debounce 5 秒先推，合併多次變動
+function schedulePush(){
+  if(!SYNC_ON) return;
+  if(_pushTimer) clearTimeout(_pushTimer);
+  _pushTimer = setTimeout(function(){ pushToCloud(); }, 5000);
 }
 function refreshAllPics(){
   CARS.forEach(function(c){ var p=document.querySelector('[data-pic="'+c.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(c.id,p._svgFn); });
@@ -658,7 +746,7 @@ _fileInput.addEventListener('change', function(){
       else { url=reader.result; }
       setImg(_uploadId, url);
       refreshCardPic(_uploadId);
-      pushToCloud();
+      schedulePush();
     };
     im.src = reader.result;
   };
@@ -765,6 +853,16 @@ document.getElementById('resetImgsBtn').addEventListener('click', function(){
 });
 
 /* ---------- 同步 / 匯出 / 匯入 按鈕 ---------- */
+var _syncToggle = document.getElementById('syncToggle');
+if(_syncToggle){
+  _syncToggle.checked = SYNC_ON;
+  _syncToggle.addEventListener('change', function(){
+    SYNC_ON = this.checked;
+    localStorage.setItem('mcqueen_sync_on', SYNC_ON ? '1' : '0');
+    if(SYNC_ON){ setSyncStatus('自動同步已開，同步中…'); pushToCloud(); }
+    else { setSyncStatus('自動同步已關（私人相只留部機）'); }
+  });
+}
 document.getElementById('syncBtn').addEventListener('click', function(){
   setSyncStatus('同步中…');
   pullFromCloud().then(function(changed){
@@ -801,7 +899,7 @@ if(_importFile){ _importFile.addEventListener('change', function(){
       }
       saveUserImgs();
       refreshAllPics();
-      pushToCloud();
+      schedulePush();
       setSyncStatus('已匯入 '+n+' 張圖 ✓');
     }catch(e){ setSyncStatus('匯入失敗：檔案唔啱'); }
   };
@@ -1038,10 +1136,10 @@ renderBookTabs();
 renderBook();
 refill();
 nextQ();
-// 開 app 自動從雲端 seed 載入官方角色圖
+// 開 app 自動從雲端 seed 載入官方角色圖 + 私人相
 pullFromCloud().then(function(changed){
-  if(changed){ refreshAllPics(); setSyncStatus('已載入官方角色圖 ✓ '+new Date().toLocaleTimeString()); }
-  else { setSyncStatus('官方角色圖已就位 ✓'); }
+  if(changed){ refreshAllPics(); setSyncStatus('已從雲端載入 ✓ '+new Date().toLocaleTimeString()); }
+  else { setSyncStatus('雲端已就位 ✓'); }
 });
 </script>
 </body>
