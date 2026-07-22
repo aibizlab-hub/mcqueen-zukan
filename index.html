@@ -1136,10 +1136,11 @@ renderBookTabs();
 renderBook();
 refill();
 nextQ();
-// 開 app 自動從雲端 seed 載入官方角色圖 + 私人相
+// 開 app 自動從雲端 seed 載入官方角色圖 + 私人相；順便將本地相（含舊有未同步嘅）推上雲
 pullFromCloud().then(function(changed){
   if(changed){ refreshAllPics(); setSyncStatus('已從雲端載入 ✓ '+new Date().toLocaleTimeString()); }
   else { setSyncStatus('雲端已就位 ✓'); }
+  if(SYNC_ON) schedulePush();
 });
 </script>
 </body>
