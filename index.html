@@ -597,25 +597,62 @@ function imgData(id){ return (userImgs[id] && userImgs[id].d) ? userImgs[id].d :
 function setImg(id, dataURL){ userImgs[id] = { d: dataURL, t: Date.now() }; saveUserImgs(); schedulePush(); }
 function delImg(id){ delete userImgs[id]; saveUserImgs(); schedulePush(); }
 
-/* ---- 雲端同步（零 token：私人相放 dpaste 新 paste，pointer 放 jsonblob；按 ts 合併） ---- */
-var SYNC_BLOB_ID = '019f8a40-1b4d-7daf-afcd-eec154166e8c'; // jsonblob pointer（只存最新相片 paste URL）
+/* ---- 雲端同步（零 token：私人相分塊放 dpaste 新 paste，pointer 放 jsonblob；按 ts 合併） ---- */
+var SYNC_BLOB_ID = '019f8a40-1b4d-7daf-afcd-eec154166e8c'; // jsonblob pointer（只存 {ts, batches:[{url,ids}]}）
 var SYNC_ON = (localStorage.getItem('mcqueen_sync_on') !== '0'); // 預設開（'0' 先關）
 var _syncing = false;
 var _pushTimer = null;
+var BATCH_BYTES = 250*1024;   // 每個 dpaste paste 上限（保守，避免 413 payload too large）
+var POST_GAP = 500;           // 每塊 POST 之間隔（ms），避免 dpaste rate limit
+var MAX_DIM = 360;            // 私人相最長邊（壓細啲慳位）
+var JPEG_Q = 0.74;
 function setSyncStatus(txt){ var el=document.getElementById('syncStatus'); if(el) el.textContent=txt; }
 
-// 讀 pointer → 攞最新相片 paste URL
+// 壓縮 dataURL → 較細 JPEG（瀏覽器 canvas；失敗 fall back 原圖）
+function compressImage(dataURL, cb){
+  var im = new Image();
+  im.onload = function(){
+    var w=im.naturalWidth||im.width, h=im.naturalHeight||im.height;
+    if(!w||!h){ cb(dataURL); return; }
+    var scale=Math.min(1, MAX_DIM/Math.max(w,h));
+    var nw=Math.max(1,Math.round(w*scale)), nh=Math.max(1,Math.round(h*scale));
+    try{
+      var cv=document.createElement('canvas'); cv.width=nw; cv.height=nh;
+      cv.getContext('2d').drawImage(im,0,0,nw,nh);
+      cb(cv.toDataURL('image/jpeg', JPEG_Q));
+    }catch(e){ cb(dataURL); }
+  };
+  im.onerror=function(){ cb(dataURL); };
+  im.src=dataURL;
+}
+// 一次性將 localStorage 入面過大嘅舊相重新壓縮（遷移；新加嘅相本身已壓過）
+(function migrateCompress(){
+  var ids=Object.keys(userImgs);
+  var todo=ids.filter(function(id){ var d=userImgs[id]&&userImgs[id].d; return d && d.indexOf('data:image/')===0 && d.length>180000; });
+  if(!todo.length) return;
+  var i=0;
+  (function step(){
+    if(i>=todo.length){ saveUserImgs(); schedulePush(); return; }
+    var id=todo[i++], ent=userImgs[id];
+    compressImage(ent.d, function(out){
+      if(out && out.length < ent.d.length){ userImgs[id]={d:out, t:ent.t||Date.now()}; }
+      step();
+    });
+  })();
+})();
+
+// 讀 pointer（jsonblob）
 function readPointer(){
   return fetch('https://jsonblob.com/api/jsonBlob/'+SYNC_BLOB_ID, { headers:{'Accept':'application/json'} })
     .then(function(r){ if(!r.ok) throw new Error('nop'); return r.json(); })
     .catch(function(){ return null; });
 }
-// 寫 pointer（CORS PUT，瀏覽器可寫）
-function writePointer(url, ts){
+// 寫 pointer（新格式 {ts, batches:[{url,ids}]}；瀏覽器 CORS PUT 可寫）
+function writePointer(ptr){
   return fetch('https://jsonblob.com/api/jsonBlob/'+SYNC_BLOB_ID, {
     method:'PUT',
     headers:{'Content-Type':'application/json','X-jsonblob-id':SYNC_BLOB_ID},
-    body: JSON.stringify({url:url, ts:ts})
+    body: JSON.stringify(ptr)
   }).then(function(r){ return r.ok; }).catch(function(){ return false; });
 }
 // 讀一個 dpaste 相片 paste
@@ -641,27 +678,31 @@ function mergeCloudImages(data){
   return changed;
 }
 
-// 拉雲端：官方 seed（原有）+ 私人相 pointer→paste（新增）
+// 拉雲端：官方 seed（原有）+ 私人相 pointer→多個 paste（分塊）
 function pullFromCloud(){
-  var proms = SEED_URLS.map(function(u){
+  var seedProms = SEED_URLS.map(function(u){
     return fetch(u, { headers:{'Accept':'application/json'} })
       .then(function(r){ if(!r.ok) throw new Error('no'); return r.text(); })
       .then(function(txt){ return JSON.parse(txt); })
       .catch(function(){ return null; });
   });
-  var privateProm = readPointer().then(function(ptr){
-    if(!ptr || !ptr.url) return null;
-    return fetchPaste(ptr.url);
-  });
-  return Promise.all(proms.concat([privateProm])).then(function(list){
-    var changed=false;
-    list.forEach(function(data){ if(mergeCloudImages(data)) changed=true; });
-    if(changed){ saveUserImgs(); }
-    return changed;
+  return Promise.all(seedProms).then(function(seedList){
+    return readPointer().then(function(ptr){
+      var batchUrls=[];
+      if(ptr && ptr.url) batchUrls.push(ptr.url);                 // 舊格式兼容
+      if(ptr && ptr.batches) ptr.batches.forEach(function(b){ if(b && b.url) batchUrls.push(b.url); });
+      return Promise.all(batchUrls.map(fetchPaste)).then(function(batchList){
+        var all=seedList.concat(batchList);
+        var changed=false;
+        all.forEach(function(data){ if(mergeCloudImages(data)) changed=true; });
+        if(changed) saveUserImgs();
+        return changed;
+      });
+    });
   });
 }
 
-// 推雲端：先拉其他人嘅相 merge（避免互蓋），再 POST 新 dpaste paste，更新 pointer
+// 推雲端：先拉其他人嘅相 merge（避免互蓋），再分塊 POST dpaste，更新 pointer
 function pushToCloud(attempt){
   if(!SYNC_ON) return Promise.resolve(false);
   if(_syncing) return Promise.resolve(false);
@@ -669,35 +710,50 @@ function pushToCloud(attempt){
   attempt = attempt || 1;
   setSyncStatus('同步中…');
   return pullFromCloud().then(function(){
-    var payload = JSON.stringify({ v:1, images: userImgs });
-    return fetch('https://dpaste.com/api/v2/', {
-      method:'POST',
-      headers:{'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json'},
-      body: 'content=' + encodeURIComponent(payload)
+    var ids = Object.keys(userImgs);
+    if(ids.length===0){ _syncing=false; setSyncStatus('無相可同步'); return false; }
+    // 分塊：每塊序列化(email-encode 後) < BATCH_BYTES
+    var batches=[], cur={}, curSize=0;
+    ids.forEach(function(id){
+      var ent=userImgs[id];
+      var sz = ent ? encodeURIComponent(JSON.stringify(ent)).length + 8 : 0;
+      if(curSize+sz > BATCH_BYTES && Object.keys(cur).length>0){ batches.push(cur); cur={}; curSize=0; }
+      cur[id]=ent; curSize+=sz;
     });
-  }).then(function(r){
-    if(!r.ok){
-      if(r.status===429 && attempt<3){ throw new Error('429'); }
-      throw new Error('post '+r.status);
+    if(Object.keys(cur).length>0) batches.push(cur);
+    var urls=[];
+    function postOne(idx){
+      if(idx>=batches.length){
+        var ts=Date.now();
+        var ptr={ ts:ts, batches: batches.map(function(b,bi){ return {url:urls[bi], ids:Object.keys(b)}; }) };
+        return writePointer(ptr).then(function(ok){
+          _syncing=false;
+          if(ok) setSyncStatus('已同步 ✓ '+ids.length+' 張 '+new Date().toLocaleTimeString());
+          else setSyncStatus('相已上載，但 pointer 更新失敗，撳「立即同步」再試');
+          return ok;
+        });
+      }
+      var payload = JSON.stringify({ v:1, images: batches[idx] });
+      return fetch('https://dpaste.com/api/v2/', {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded','Accept':'application/json'},
+        body: 'content=' + encodeURIComponent(payload)
+      }).then(function(r){
+        if(!r.ok) throw new Error('post '+r.status);
+        var loc = r.headers.get('location');
+        if(loc) return loc;
+        return r.text().then(function(txt){
+          var m = txt.match(/https?:\/\/dpaste\.com\/[A-Za-z0-9]+/);
+          return m ? m[0] : null;
+        });
+      }).then(function(rawUrl){
+        if(!rawUrl) throw new Error('no-url');
+        var finalUrl = (rawUrl.indexOf('.txt')>=0) ? rawUrl : (rawUrl.replace(/\/$/,'')+'.txt');
+        urls[idx]=finalUrl;
+        return new Promise(function(res){ setTimeout(function(){ res(postOne(idx+1)); }, POST_GAP); });
+      });
     }
-    var url = r.headers.get('location');
-    if(url) return url;
-    return r.text().then(function(txt){
-      var m = txt.match(/https?:\/\/dpaste\.com\/[A-Za-z0-9]+/);
-      if(m) return m[0];
-      try{ var j=JSON.parse(txt); if(j&&j.url) return j.url; }catch(e){}
-      return null;
-    });
-  }).then(function(rawUrl){
-    if(!rawUrl) throw new Error('no-url');
-    var finalUrl = (rawUrl.indexOf('.txt')>=0) ? rawUrl : (rawUrl.replace(/\/$/,'')+'.txt');
-    var ts = Date.now();
-    return writePointer(finalUrl, ts).then(function(ok){
-      _syncing = false;
-      if(ok){ setSyncStatus('已同步 ✓ '+Object.keys(userImgs).length+' 張 '+new Date().toLocaleTimeString()); }
-      else { setSyncStatus('相已上載，但 pointer 更新失敗，撳「立即同步」再試'); }
-      return ok;
-    });
+    return postOne(0);
   }).catch(function(err){
     _syncing = false;
     var msg = (err && err.message) || '';
@@ -705,7 +761,7 @@ function pushToCloud(attempt){
       setSyncStatus('同步節流中，'+(3*attempt)+'秒後重試…');
       return new Promise(function(res){ setTimeout(function(){ res(pushToCloud(attempt+1)); }, 3000*attempt); });
     }
-    setSyncStatus('同步失敗（'+msg+'）— 可撳「立即同步」或匯出/匯入');
+    setSyncStatus('同步失敗（'+msg+'）— 可撳「立即同步」或改用匯出/匯入');
     return Promise.resolve(false);
   });
 }
