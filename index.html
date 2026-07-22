@@ -433,110 +433,128 @@ function speakEN(txt){
 var BOOKS = [
   {id:'b1', name:'麥坤變身冊',   sub:'閃電麥坤嘅 6 款型態'},
   {id:'b2', name:'水箱溫泉鎮',   sub:'麥坤嘅好朋友同小鎮車'},
-  {id:'b3', name:'活塞杯賽車',   sub:'各路賽車手'},
-  {id:'b4', name:'世界大獎賽',   sub:'來自世界各地嘅賽車'},
-  {id:'b5', name:'重型機械隊',   sub:'工程車同救援車'},
-  {id:'b6', name:'香港交通工具隊', sub:'香港街道車同公共交通工具'}
+  {id:'b3', name:'活塞杯賽車',   sub:'Cars 1 各路賽車手'},
+  {id:'b4', name:'世界大獎賽',   sub:'Cars 2 世界各地賽車'},
+  {id:'b5', name:'次世代賽車',   sub:'Cars 3 新世代跑車'},
+  {id:'b6', name:'更多汽車角色', sub:'更多 Cars 好朋友同特別角色'}
 ];
 
 var CARS = [];
 function pushCar(o){ CARS.push(o); }
 
-/* Book 1 — 麥坤 6 款型態（官方圖，dpaste seed 載入） */
-pushCar({id:'classic', book:'b1', name:'經典麥坤', en:'Classic McQueen', kind:'racer', body:'#e32017', num:'95', lightning:true, tag:'Cars 1'});
-pushCar({id:'wgp', book:'b1', name:'世界大賽麥坤', en:'World Grand Prix', kind:'racer', body:'#e32017', num:'95', headlight:true, tag:'Cars 2'});
-pushCar({id:'trainer', book:'b1', name:'教練麥坤', en:'Trainer McQueen', kind:'racer', body:'#e32017', num:'95', lightning:true, tag:'Cars 3'});
-pushCar({id:'primer', book:'b1', name:'灰色底漆麥坤', en:'Primer McQueen', kind:'racer', body:'#9a9a9a', num:'95', tag:'Cars 3'});
-pushCar({id:'mud', book:'b1', name:'泥漿麥坤', en:'Mud McQueen', kind:'racer', body:'#6b4f2a', num:'95', tag:'Cars 3'});
-pushCar({id:'fabulous', book:'b1', name:'藍色麥坤', en:'Fabulous McQueen', kind:'racer', body:'#1f4e9b', num:'95', tag:'Cars 3'});
+/* ===== 全 MCQUEEN / Cars 系列真角色（圖經 dpaste seed 載入） ===== */
 
-/* Book 2 — 水箱溫泉鎮：12 位朋友（官方圖）+ 8 位小鎮原創車 */
-var f2 = [
-  ['mater','拖車阿麥','Mater','truck','#7a5a32'],
-  ['sally','莎莉','Sally Carrera','racer','#2a7de1'],
-  ['doc','韓德士醫生','Doc Hudson','racer','#1f4e9b'],
-  ['cruz','嘉露斯','Cruz Ramirez','racer','#ffc800'],
-  ['ramone','雷蒙','Ramone','racer','#1f9bd6'],
-  ['luigi','路易仔','Luigi','racer','#f2c200'],
-  ['fillmore','花律','Fillmore','truck','#3fae5a'],
-  ['sarge','沙治','Sarge','truck','#4e6b2a'],
-  ['sheriff','警長','Sheriff','truck','#3a3a3a'],
-  ['red','紅色消防車','Red','truck','#d62828'],
-  ['chick','積克','Chick Hicks','racer','#3fa535'],
-  ['storm','積遜暴風','Jackson Storm','racer','#222a44']
-];
-f2.forEach(function(a){ pushCar({id:a[0], book:'b2', name:a[1], en:a[2], kind:a[3], body:a[4]}); });
-var rs2 = [
-  ['lizzie','莉茲','Lizzie','racer','#7a3b8f'],
-  ['stanley','史丹利','Stanley','truck','#9a9a9a'],
-  ['flo','科樂','Flo','racer','#e64980'],
-  ['guido','古義多','Guido','racer','#1f9bd6'],
-  ['tex','特克斯','Tex','truck','#b8160f'],
-  ['mia','美亞','Mia','racer','#e64980'],
-  ['tia','提亞','Tia','racer','#7048e8'],
-  ['boost','布斯','Boost','racer','#37b24d']
-];
-rs2.forEach(function(a){ pushCar({id:a[0], book:'b2', name:a[1], en:a[2], kind:a[3], body:a[4]}); });
+/* Book 1 — 麥坤變身冊（6 款型態，真角色圖） */
+pushCar({id:'mq_classic', book:'b1', name:'經典麥坤', en:'Lightning McQueen', kind:'racer', body:'#e32017', num:'95', lightning:true, tag:'Cars 1'});
+pushCar({id:'mq_wgp', book:'b1', name:'世界大賽麥坤', en:'Lightning McQueen (WGP)', kind:'racer', body:'#e32017', num:'95', headlight:true, tag:'Cars 2'});
+pushCar({id:'mq_trainer', book:'b1', name:'教練麥坤', en:'Lightning McQueen (Trainer)', kind:'racer', body:'#e32017', num:'95', lightning:true, tag:'Cars 3'});
+pushCar({id:'mq_primer', book:'b1', name:'灰底漆麥坤', en:'Lightning McQueen (Primer)', kind:'racer', body:'#9a9a9a', num:'95', tag:'Cars 3'});
+pushCar({id:'mq_mud', book:'b1', name:'泥漿麥坤', en:'Chester Whipplefilter', kind:'racer', body:'#6b4f2a', num:'95', tag:'Cars 3'});
+pushCar({id:'mq_fabulous', book:'b1', name:'藍色致敬麥坤', en:'Fabulous Lightning McQueen', kind:'racer', body:'#1f4e9b', num:'95', tag:'Cars 3'});
 
-/* Book 3 — 活塞杯賽車（18 款原創賽車） */
-var b3 = [
-  ['紅火雷','Red Bolt','#e32017',3],['藍箭','Blue Arrow','#1f4e9b',7],['黃蜂','Yellow Bee','#ffc800',11],
-  ['綠巨人','Green Giant','#37b24d',5],['紫電','Purple Thunder','#7048e8',9],['橙飈','Orange Zoom','#ff7a1a',14],
-  ['黑豹','Black Panther','#2b2b35',2],['銀光','Silver Light','#b0b0b0',8],['金旋風','Gold Tornado','#e8c34a',1],
-  ['粉紅俏','Pink Charm','#e64980',6],['青松','Cyan Pine','#17a2b8',12],['啡風','Brown Wind','#8a5a2b',4],
-  ['白雲','White Cloud','#e8e8e8',10],['烈焰','Flame','#ff4500',23],['冰藍','Ice Blue','#7ad1ff',17],
-  ['魅影','Shadow','#4b3b6b',19],['閃光','Flash','#ffd21a',95],['疾風','Gale','#2f9e6b',21]
-];
-b3.forEach(function(a,i){ pushCar({id:'r3_'+i, book:'b3', name:a[0], en:a[1], kind:'racer', body:a[2], num:''+a[3]}); });
+/* Book 2 — 水箱溫泉鎮 Radiator Springs（20 位真角色） */
+pushCar({id:'mater', book:'b2', name:'拖車阿麥', en:'Mater', kind:'truck', body:'#7a5a32', tag:'最佳朋友'});
+pushCar({id:'sally', book:'b2', name:'莎莉', en:'Sally Carrera', kind:'racer', body:'#2a7de1', tag:'女朋友'});
+pushCar({id:'doc', book:'b2', name:'韓德士醫生', en:'Doc Hudson', kind:'racer', body:'#1f4e9b', tag:'師父'});
+pushCar({id:'ramone', book:'b2', name:'雷蒙', en:'Ramone', kind:'racer', body:'#1f9bd6', tag:'噴漆達人'});
+pushCar({id:'luigi', book:'b2', name:'路易仔', en:'Luigi', kind:'racer', body:'#f2c200', tag:'車軚店'});
+pushCar({id:'guido', book:'b2', name:'古仔', en:'Guido', kind:'racer', body:'#1f9bd6', tag:'意大利'});
+pushCar({id:'fillmore', book:'b2', name:'花律', en:'Fillmore', kind:'truck', body:'#3fae5a', tag:'和平'});
+pushCar({id:'sarge', book:'b2', name:'沙治', en:'Sarge', kind:'truck', body:'#4e6b2a', tag:'老兵'});
+pushCar({id:'sheriff', book:'b2', name:'警長', en:'Sheriff', kind:'truck', body:'#3a3a3a', tag:'小鎮警察'});
+pushCar({id:'red', book:'b2', name:'紅色消防車', en:'Red', kind:'truck', body:'#d62828', tag:'消防'});
+pushCar({id:'flo', book:'b2', name:'花姐', en:'Flo', kind:'racer', body:'#e64980', tag:'油站'});
+pushCar({id:'lizzie', book:'b2', name:'莉琪', en:'Lizzie', kind:'racer', body:'#7a3b8f', tag:'古董'});
+pushCar({id:'stanley', book:'b2', name:'史丹利', en:'Stanley', kind:'truck', body:'#9a9a9a', tag:'創始人'});
+pushCar({id:'tex', book:'b2', name:'德士叔', en:'Tex Dinoco', kind:'truck', body:'#b8160f', tag:'Dinoco'});
+pushCar({id:'mia', book:'b2', name:'美亞', en:'Mia', kind:'racer', body:'#e64980', tag:'孖生'});
+pushCar({id:'tia', book:'b2', name:'提亞', en:'Tia', kind:'racer', body:'#7048e8', tag:'孖生'});
+pushCar({id:'boost', book:'b2', name:'布斯', en:'Boost', kind:'racer', body:'#37b24d', tag:'改裝'});
+pushCar({id:'dj', book:'b2', name:'DJ', en:'DJ', kind:'racer', body:'#17a2b8', tag:'改裝'});
+pushCar({id:'wingo', book:'b2', name:'雲高', en:'Wingo', kind:'racer', body:'#ff7a1a', tag:'改裝'});
+pushCar({id:'snotrod', book:'b2', name:'史諾特', en:'Snotrod', kind:'racer', body:'#8a5a2b', tag:'改裝'});
 
-/* Book 4 — 世界大獎賽（18 款，以 Cars 2 國際賽車為藍本） */
-var b4 = [
-  ['法蘭西斯科','Francesco Bernoulli','#c0392b',1],['戶田朱里','Shu Todoroki','#c0392b',7],['繞圈兒','Raoul ÇaRoule','#2f9e6b',6],
-  ['傑夫','Jeff Gorvette','#c0392b',9],['路易斯','Lewis Hamilton','#1f4e9b',2],['米高','Miguel Camino','#c0392b',5],
-  ['力普','Rip Clutchgoneski','#17a2b8',4],['卡拉','Carla Veloso','#e64980',8],['尼高','Nigel Gearsley','#1f4e9b',9],
-  ['麥斯','Max Schnell','#1f4e9b',3],['龍哥','Long Ge','#c0392b',11],['布魯斯','Bruce Boxmann','#1f4e9b',12],
-  ['禪一','Zen-ichi','#c0392b',14],['里奧','Rio','#2f9e6b',15],['阿歷斯','Alex','#7048e8',16],
-  ['丹尼','Denny','#ff7a1a',18],['奧圖','Otto','#ffc800',20],['卡爾','Karl','#37b24d',22]
-];
-b4.forEach(function(a,i){ pushCar({id:'r4_'+i, book:'b4', name:a[0], en:a[1], kind:'racer', body:a[2], num:''+a[3]}); });
+/* Book 3 — 活塞杯賽車 Piston Cup（18 位真角色） */
+pushCar({id:'chick', book:'b3', name:'積克', en:'Chick Hicks', kind:'racer', body:'#3fa535', num:'86', tag:'對手'});
+pushCar({id:'king', book:'b3', name:'車王', en:'Strip Weathers (The King)', kind:'racer', body:'#1f4e9b', num:'43', tag:'傳奇'});
+pushCar({id:'cal', book:'b3', name:'卡爾', en:'Cal Weathers', kind:'racer', body:'#1f4e9b', num:'42', tag:'傳奇'});
+pushCar({id:'sage', book:'b3', name:'雲達', en:'Sage VanDerSpin', kind:'racer', body:'#7048e8', tag:'賽車'});
+pushCar({id:'ruby', book:'b3', name:'露比', en:"Ruby O'Metter", kind:'racer', body:'#e64980', tag:'賽車'});
+pushCar({id:'ernie', book:'b3', name:'阿尼', en:'Ernie Gearson', kind:'racer', body:'#37b24d', tag:'賽車'});
+pushCar({id:'slider', book:'b3', name:'史禮達', en:'Slider Petrolski', kind:'racer', body:'#17a2b8', tag:'賽車'});
+pushCar({id:'dusty', book:'b3', name:'達斯弟', en:'Dusty Rust-eze', kind:'car', body:'#b0b0b0', tag:'Rust-eze'});
+pushCar({id:'rusty', book:'b3', name:'拉斯弟', en:'Rusty Rust-eze', kind:'car', body:'#b0b0b0', tag:'Rust-eze'});
+pushCar({id:'darrell', book:'b3', name:'達雷爾', en:'Darrell Cartrip', kind:'car', body:'#d62828', tag:'主持'});
+pushCar({id:'bobcut', book:'b3', name:'保伯', en:'Bob Cutlass', kind:'car', body:'#3a3a3a', tag:'主持'});
+pushCar({id:'kori', book:'b3', name:'歌麗', en:'Kori Turbowitz', kind:'car', body:'#e64980', tag:'記者'});
+pushCar({id:'leerev', book:'b3', name:'李爾', en:'Lee Revkins', kind:'racer', body:'#ffc800', tag:'賽車'});
+pushCar({id:'brad', book:'b3', name:'畢特', en:'Brad Klassen', kind:'racer', body:'#1f9bd6', tag:'賽車'});
+pushCar({id:'claude', book:'b3', name:'哥撈', en:'Claude Scruggs', kind:'racer', body:'#9a9a9a', tag:'賽車'});
+pushCar({id:'winford', book:'b3', name:'雲福特', en:'Winford Bradford Rutherford', kind:'racer', body:'#2f9e6b', tag:'賽車'});
+pushCar({id:'haulin', book:'b3', name:'侯林', en:"Haul In' Gascoine", kind:'racer', body:'#ff7a1a', tag:'賽車'});
+pushCar({id:'misti', book:'b3', name:'美絲', en:'Misti Motorkrass', kind:'racer', body:'#e32017', tag:'賽車'});
 
-/* Book 5 — 重型機械隊（20 款工程／救援車） */
-var b5 = [
-  ['推土機阿力','Bulldozer Ali','bulldozer','#f2c200'],['吊臂車大鉗','Crane Clip','truck','#ff7a1a'],
-  ['消防車紅利','Fire Truck','truck','#d62828'],['警車阿Sir','Police Car','truck','#2b2b35'],
-  ['垃圾車清哥','Bin Truck','truck','#37b24d'],['石屎車阿泥','Cement Mixer','truck','#b0b0b0'],
-  ['貨櫃車阿櫃','Container','truck','#1f4e9b'],['救護車白仔','Ambulance','truck','#e8e8e8'],
-  ['鏟雪車雪哥','Snow Plow','bulldozer','#7ad1ff'],['挖掘機阿挖','Digger','bulldozer','#ffc800'],
-  ['油罐車阿油','Tanker','truck','#e64980'],['灑水車水哥','Water Truck','truck','#17a2b8'],
-  ['軍車沙治','Sarge Jr','truck','#4e6b2a'],['郵件車阿郵','Mail Truck','truck','#1f4e9b'],
-  ['雪糕車阿冰','Ice Cream','truck','#e64980'],['搬運車阿搬','Mover','truck','#8a5a2b'],
-  ['清道夫阿掃','Sweeper','truck','#ffd21a'],['工程車阿工','Builder','bulldozer','#ff7a1a'],
-  ['吊運車阿吊','Lifter','truck','#7048e8'],['救援車阿救','Rescue','truck','#d62828']
-];
-b5.forEach(function(a,i){ pushCar({id:'r5_'+i, book:'b5', name:a[0], en:a[1], kind:a[2], body:a[3]}); });
+/* Book 4 — 世界大獎賽 World Grand Prix / Cars 2（18 位真角色） */
+pushCar({id:'francesco', book:'b4', name:'法蘭斯高', en:'Francesco Bernoulli', kind:'racer', body:'#c0392b', num:'1', tag:'意大利'});
+pushCar({id:'shu', book:'b4', name:'戶田朱里', en:'Shu Todoroki', kind:'racer', body:'#c0392b', num:'7', tag:'日本'});
+pushCar({id:'raoul', book:'b4', name:'魯力', en:'Raoul ÇaRoule', kind:'racer', body:'#2f9e6b', num:'6', tag:'法國'});
+pushCar({id:'rip', book:'b4', name:'力普', en:'Rip Clutchgoneski', kind:'racer', body:'#17a2b8', num:'4', tag:'美國'});
+pushCar({id:'max', book:'b4', name:'麥斯', en:'Max Schnell', kind:'racer', body:'#1f4e9b', num:'3', tag:'德國'});
+pushCar({id:'miguel', book:'b4', name:'米高', en:'Miguel Camino', kind:'racer', body:'#c0392b', num:'5', tag:'西班牙'});
+pushCar({id:'jeff', book:'b4', name:'傑夫', en:'Jeff Gorvette', kind:'racer', body:'#c0392b', num:'9', tag:'美國'});
+pushCar({id:'lewis', book:'b4', name:'路易斯', en:'Lewis Hamilton', kind:'racer', body:'#1f4e9b', num:'2', tag:'英國'});
+pushCar({id:'nigel', book:'b4', name:'尼高', en:'Nigel Gearsley', kind:'racer', body:'#1f4e9b', num:'9', tag:'英國'});
+pushCar({id:'carla', book:'b4', name:'卡拉', en:'Carla Veloso', kind:'racer', body:'#e64980', num:'8', tag:'巴西'});
+pushCar({id:'finn', book:'b4', name:'胡狼芬', en:'Finn McMissile', kind:'car', body:'#2b2b35', tag:'特工'});
+pushCar({id:'holley', book:'b4', name:'荷莉', en:'Holley Shiftwell', kind:'car', body:'#7048e8', tag:'特工'});
+pushCar({id:'profz', book:'b4', name:'薜教授', en:'Professor Zündapp', kind:'car', body:'#444444', tag:'反派'});
+pushCar({id:'grem', book:'b4', name:'基林', en:'Grem', kind:'car', body:'#444444', tag:'反派'});
+pushCar({id:'acer', book:'b4', name:'亞撒', en:'Acer', kind:'car', body:'#555555', tag:'反派'});
+pushCar({id:'rod', book:'b4', name:'力圖', en:'Rod Redline', kind:'car', body:'#c0392b', tag:'特工'});
+pushCar({id:'siddeley', book:'b4', name:'薛德禮', en:'Siddeley', kind:'car', body:'#bfc7d0', tag:'飛機'});
+pushCar({id:'leland', book:'b4', name:'李蘭', en:'Leland Turbo', kind:'car', body:'#2b2b35', tag:'特工'});
 
-/* Book 6 — 香港交通工具隊（18 款香港街道車同公共交通工具，原創 SVG） */
-var b6 = [
-  ['雙層巴士','Double-Decker Bus','bus','#ff7a1a'],
-  ['電車','Tram','tram','#c0392b'],
-  ['紅的','Taxi','car','#d62828'],
-  ['港鐵列車','MTR Train','train','#1f4e9b'],
-  ['綠色小巴','Minibus','bus','#2f9e6b'],
-  ['渡輪','Ferry','boat','#17a2b8'],
-  ['校車','School Bus','bus','#ffc800'],
-  ['郵政速遞車','Postal Van','car','#1f4e9b'],
-  ['電單車','Motorbike','bike','#333333'],
-  ['旅遊巴','Tour Bus','bus','#7048e8'],
-  ['機場巴士','Airport Bus','bus','#0099cc'],
-  ['搬屋貨車','Moving Truck','truck','#8a5a2b'],
-  ['飲品車','Beverage Truck','truck','#e64980'],
-  ['麵包車','Van','car','#b0b0b0'],
-  ['農耕車','Tractor','bulldozer','#37b24d'],
-  ['清障車','Recovery Truck','truck','#555555'],
-  ['觀光艇','Tour Boat','boat','#2f9e6b'],
-  ['書店車','Bookmobile','bus','#9a3b8f']
-];
-b6.forEach(function(a,i){ pushCar({id:'r6_'+i, book:'b6', name:a[0], en:a[1], kind:a[2], body:a[3]}); });
+/* Book 5 — 次世代賽車 Cars 3（18 位真角色） */
+pushCar({id:'storm', book:'b5', name:'積遜暴風', en:'Jackson Storm', kind:'racer', body:'#222a44', num:'20', tag:'新世代'});
+pushCar({id:'cruz', book:'b5', name:'嘉露斯', en:'Cruz Ramirez', kind:'racer', body:'#ffc800', num:'51', tag:'新世代'});
+pushCar({id:'sterling', book:'b5', name:'史特靈', en:'Sterling', kind:'car', body:'#b8160f', tag:'老闆'});
+pushCar({id:'fritter', book:'b5', name:'費老師', en:'Miss Fritter', kind:'bus', body:'#c0392b', tag:'怪物校巴'});
+pushCar({id:'danny', book:'b5', name:'阿丹', en:'Danny Swervez', kind:'racer', body:'#17a2b8', num:'84', tag:'新世代'});
+pushCar({id:'ryan', book:'b5', name:'阿萊', en:'Ryan Laney', kind:'racer', body:'#ff7a1a', num:'39', tag:'新世代'});
+pushCar({id:'bubba', book:'b5', name:'巴巴', en:'Bubba Wheelhouse', kind:'racer', body:'#3fa535', num:'44', tag:'新世代'});
+pushCar({id:'chase', book:'b5', name:'蔡斯', en:'Chase Racelott', kind:'racer', body:'#1f4e9b', num:'24', tag:'新世代'});
+pushCar({id:'tim', book:'b5', name:'添姆', en:'Tim Treadless', kind:'racer', body:'#2f9e6b', num:'40', tag:'新世代'});
+pushCar({id:'bobby', book:'b5', name:'波比', en:'Bobby Swift', kind:'racer', body:'#e32017', num:'19', tag:'新世代'});
+pushCar({id:'brick', book:'b5', name:'耶利', en:'Brick Yardley', kind:'racer', body:'#7048e8', num:'53', tag:'新世代'});
+pushCar({id:'natalie', book:'b5', name:'娜塔莉', en:'Natalie Certain', kind:'car', body:'#222a44', tag:'分析員'});
+pushCar({id:'smokey', book:'b5', name:'煙叔', en:'Smokey', kind:'car', body:'#9a9a9a', tag:'師父'});
+pushCar({id:'river', book:'b5', name:'河流', en:'River Scott', kind:'racer', body:'#d62828', num:'23', tag:'傳奇'});
+pushCar({id:'junior', book:'b5', name:'祖利亞', en:'Junior Moon', kind:'racer', body:'#ffc800', tag:'傳奇'});
+pushCar({id:'louise', book:'b5', name:'露薏絲', en:'Louise Nash', kind:'racer', body:'#e64980', tag:'傳奇'});
+pushCar({id:'arvy', book:'b5', name:'阿維', en:'Arvy', kind:'racer', body:'#1f9bd6', tag:'新世代'});
+pushCar({id:'drdamage', book:'b5', name:'破壞醫生', en:'Dr. Damage', kind:'bus', body:'#444444', tag:'撞車'});
+
+/* Book 6 — 更多 Cars 角色 / 特別（18+2 = 20 位真角色） */
+pushCar({id:'elmachismo', book:'b6', name:'機械猛男', en:'El Machismo', kind:'racer', body:'#c0392b', tag:'墨西哥'});
+pushCar({id:'meldorado', book:'b6', name:'梅爾', en:'Mel Dorado', kind:'car', body:'#e64980', tag:'主持'});
+pushCar({id:'galpin', book:'b6', name:'加爾', en:'Galpin', kind:'racer', body:'#1f4e9b', tag:'賽車'});
+pushCar({id:'zil', book:'b6', name:'薛爾', en:'Zil', kind:'racer', body:'#7048e8', tag:'賽車'});
+pushCar({id:'tolga', book:'b6', name:'托加', en:'Tolga Trunk', kind:'truck', body:'#8a5a2b', tag:'貨櫃'});
+pushCar({id:'petrov', book:'b6', name:'柏杜夫', en:'Petrov Trunk', kind:'truck', body:'#555555', tag:'貨櫃'});
+pushCar({id:'ivan', book:'b6', name:'伊凡', en:'Ivan', kind:'racer', body:'#37b24d', tag:'賽車'});
+pushCar({id:'otto', book:'b6', name:'奧圖', en:'Otto Bonn', kind:'racer', body:'#ffc800', tag:'賽車'});
+pushCar({id:'cortex', book:'b6', name:'哥域', en:'Cortex', kind:'racer', body:'#2f9e6b', tag:'賽車'});
+pushCar({id:'munier', book:'b6', name:'艦長', en:'Captain Munier', kind:'boat', body:'#17a2b8', tag:'船'});
+pushCar({id:'gremlin', book:'b6', name:'基連', en:'J. Curby Gremlin', kind:'racer', body:'#9a9a9a', tag:'賽車'});
+pushCar({id:'crusty', book:'b6', name:'卡仔', en:'Crusty Rotor', kind:'heli', body:'#bfc7d0', tag:'直昇機'});
+pushCar({id:'todd', book:'b6', name:'陶德', en:'Todd', kind:'car', body:'#b0b0b0', tag:'小鎮'});
+pushCar({id:'rm', book:'b6', name:'阿姆', en:'R.M.', kind:'racer', body:'#e32017', tag:'賽車'});
+pushCar({id:'brian', book:'b6', name:'拜仁', en:'Brian', kind:'racer', body:'#1f9bd6', tag:'賽車'});
+pushCar({id:'goldberg', book:'b6', name:'高拔', en:'A. Goldberg', kind:'racer', body:'#ff7a1a', tag:'賽車'});
+pushCar({id:'emma', book:'b6', name:'愛瑪', en:'Emma', kind:'car', body:'#e64980', tag:'小鎮'});
+pushCar({id:'stewart', book:'b6', name:'史超域', en:'Stewart', kind:'car', body:'#3a3a3a', tag:'小鎮'});
+pushCar({id:'brent', book:'b6', name:'賓特', en:'Brent Mustangburger', kind:'car', body:'#1f4e9b', tag:'主持'});
+pushCar({id:'hobbs', book:'b6', name:'賀斯', en:'David Hobbscap', kind:'car', body:'#3a3a3a', tag:'主持'});
 
 function carsOfBook(bid){ return CARS.filter(function(c){ return c.book===bid; }); }
 function bookName(bid){ for(var i=0;i<BOOKS.length;i++){ if(BOOKS[i].id===bid) return BOOKS[i].name; } return bid; }
@@ -551,7 +569,15 @@ function carThumb(c){
 /* ---------- 用家自訂圖片（可雲端同步 + 匯出/匯入，私隱見 footer） ---------- */
 var UIMGS_KEY = 'mcqueen_user_imgs_v2';
 // 官方角色圖 seed（匿名 dpaste，不可改；圖以 base64 存，app 開網頁自動 pull，任何裝置都見到）
-var SEED_URL = 'https://dpaste.com/9265R49KH.txt';
+// 6 本貼紙簿各一個 seed URL，開 app 時全部載入合併
+var SEED_URLS = [
+  'https://dpaste.com/DUC9XTABL.txt',  // b1 麥坤變身冊 (6)
+  'https://dpaste.com/C7HHANWX7.txt',  // b2 水箱溫泉鎮 (16+)
+  'https://dpaste.com/CYW7DWSS3.txt',  // b3 活塞杯賽車
+  'https://dpaste.com/3F9KPULVV.txt',  // b4 世界大獎賽
+  'https://dpaste.com/9BBMYMDVL.txt',  // b5 次世代賽車
+  'https://dpaste.com/EW6ENYMHP.txt'   // b6 更多汽車角色
+];
 
 function loadUserImgs(){
   try{
@@ -577,23 +603,30 @@ function pushToCloud(){
   return Promise.resolve(true);
 }
 function pullFromCloud(){
-  return fetch(SEED_URL, { headers:{'Accept':'application/json'} })
-    .then(function(r){ if(!r.ok) throw new Error('no'); return r.text(); })
-    .then(function(txt){ return JSON.parse(txt); })
-    .then(function(data){
-      var imgs = (data && data.images) ? data.images : {};
-      var changed=false;
+  var proms = SEED_URLS.map(function(u){
+    return fetch(u, { headers:{'Accept':'application/json'} })
+      .then(function(r){ if(!r.ok) throw new Error('no'); return r.text(); })
+      .then(function(txt){ return JSON.parse(txt); })
+      .catch(function(){ return null; });
+  });
+  return Promise.all(proms).then(function(list){
+    var changed=false;
+    list.forEach(function(data){
+      if(!data || !data.images) return;
+      var imgs = data.images;
       for(var id in imgs){ if(!imgs.hasOwnProperty(id)) continue;
         var cloud = imgs[id];
+        if(typeof cloud === 'string'){ cloud = {d: cloud, t: 0}; }
         var local = userImgs[id];
         var cloudT = (cloud && cloud.t) ? cloud.t : 0;
         var localT = (local && local.t) ? local.t : 0;
         if(!local || cloudT >= localT){ userImgs[id]=cloud; changed=true; }
       }
-      if(changed){ saveUserImgs(); }
-      return changed;
-    })
-    .catch(function(){ return false; });
+    });
+    if(userImgs['mq_classic'] && !userImgs['hero']) userImgs['hero']=userImgs['mq_classic'];
+    if(changed){ saveUserImgs(); }
+    return changed;
+  });
 }
 function refreshAllPics(){
   CARS.forEach(function(c){ var p=document.querySelector('[data-pic="'+c.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(c.id,p._svgFn); });
