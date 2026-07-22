@@ -183,7 +183,7 @@
   <section id="how">
     <h2 class="sec">點玩？</h2>
     <div class="howto">
-      <div class="c"><b>1. 睇圖鑑</b><p>超過 100 款車！分 6 本分類睇：麥坤變身、水箱溫泉鎮、活塞杯、世界大獎賽、重型機械、飛天入水。</p></div>
+      <div class="c"><b>1. 睇圖鑑</b><p>超過 100 款車！分 6 本分類睇：麥坤變身、水箱溫泉鎮、活塞杯、世界大獎賽、重型機械、香港交通工具。</p></div>
       <div class="c"><b>2. 玩遊戲</b><p>數圖案、跟規律（例如 1 粒星 = 2 個正方形）、認車、仲有香港錢幣題（5蚊+2蚊=？）。全部 5 歲程度。</p></div>
       <div class="c"><b>3. 攞貼紙</b><p>答啱一題，就得到一張車型貼紙！</p></div>
       <div class="c"><b>4. 集貼紙簿</b><p>6 本貼紙簿，總共 100 款車，慢慢集齊唔會咁快玩完！</p></div>
@@ -254,7 +254,7 @@ function eyeSvg(x,y){
   return '<circle cx="'+x+'" cy="'+y+'" r="7" fill="#fff"/><circle cx="'+x+'" cy="'+y+'" r="3.4" fill="#2b2b35"/>';
 }
 function shuffle(a){ var b=a.slice(); b.sort(function(){return Math.random()-0.5;}); return b; }
-/* ---------- 畫車 / 飛機 / 船（原創 SVG） ---------- */
+/* ---------- 畫車 / 船 / 巴士 / 火車 / 電單車（原創 SVG） ---------- */
 function drawCar(o){
   o = o || {};
   var body = o.body || '#e32017';
@@ -283,6 +283,38 @@ function drawCar(o){
     s += '<rect x="92" y="42" width="36" height="42" rx="8" fill="'+roof+'"/>';
     s += '<path d="M110,42 L150,42 L110,12 Z" fill="#fff" stroke="'+body+'" stroke-width="2"/>';
     if(eye){ s += eyeSvg(68,98)+eyeSvg(92,98); }
+    s += '</svg>';
+    return s;
+  }
+  if(kind==='bus' || kind==='tram'){
+    s += wheel(58)+wheel(162);
+    s += '<rect x="20" y="58" width="180" height="58" rx="14" fill="'+body+'"/>';
+    s += '<rect x="28" y="66" width="164" height="22" rx="6" fill="#bfe3ff"/>';
+    for(var wx=34; wx<186; wx+=22){ s += '<rect x="'+wx+'" y="66" width="3" height="22" fill="'+body+'"/>'; }
+    if(kind==='tram'){
+      s += '<line x1="110" y1="58" x2="110" y2="30" stroke="#444" stroke-width="3"/>';
+      s += '<line x1="92" y1="30" x2="128" y2="30" stroke="#444" stroke-width="3"/>';
+    }
+    if(eye){ s += eyeSvg(72,90)+eyeSvg(150,90); }
+    s += '</svg>';
+    return s;
+  }
+  if(kind==='train'){
+    s += wheel(52)+wheel(168);
+    s += '<rect x="14" y="54" width="192" height="62" rx="16" fill="'+body+'"/>';
+    s += '<path d="M196,68 q14,6 14,24 l0,14 q-14,2 -14,-12 z" fill="'+shade(body,0.82)+'"/>';
+    s += '<rect x="24" y="62" width="166" height="26" rx="6" fill="#bfe3ff"/>';
+    for(var wx=30; wx<182; wx+=24){ s += '<rect x="'+wx+'" y="62" width="3" height="26" fill="'+body+'"/>'; }
+    if(eye){ s += eyeSvg(58,96)+eyeSvg(150,96); }
+    s += '</svg>';
+    return s;
+  }
+  if(kind==='bike'){
+    s += wheel(54)+wheel(166);
+    s += '<path d="M38,118 L78,82 L142,82 L178,118 Z" fill="'+body+'"/>';
+    s += '<line x1="142" y1="82" x2="152" y2="58" stroke="#333" stroke-width="4" stroke-linecap="round"/>';
+    s += '<rect x="74" y="62" width="46" height="14" rx="7" fill="'+shade(body,0.8)+'"/>';
+    if(eye){ s += eyeSvg(98,74)+eyeSvg(122,74); }
     s += '</svg>';
     return s;
   }
@@ -404,7 +436,7 @@ var BOOKS = [
   {id:'b3', name:'活塞杯賽車',   sub:'各路賽車手'},
   {id:'b4', name:'世界大獎賽',   sub:'來自世界各地嘅賽車'},
   {id:'b5', name:'重型機械隊',   sub:'工程車同救援車'},
-  {id:'b6', name:'飛天入水隊',   sub:'飛機同船'}
+  {id:'b6', name:'香港交通工具隊', sub:'香港街道車同公共交通工具'}
 ];
 
 var CARS = [];
@@ -483,17 +515,26 @@ var b5 = [
 ];
 b5.forEach(function(a,i){ pushCar({id:'r5_'+i, book:'b5', name:a[0], en:a[1], kind:a[2], body:a[3]}); });
 
-/* Book 6 — 飛天入水隊（18 款飛機／船） */
+/* Book 6 — 香港交通工具隊（18 款香港街道車同公共交通工具，原創 SVG） */
 var b6 = [
-  ['直昇機阿升','Heli Up','heli','#1f4e9b'],['救援直昇機','Rescue Heli','heli','#d62828'],
-  ['警察直昇機','Police Heli','heli','#2b2b35'],['新聞直昇機','News Heli','heli','#17a2b8'],
-  ['小艇阿波','Boat Wave','boat','#1f4e9b'],['快艇阿快','Speed Boat','boat','#e32017'],
-  ['漁船阿漁','Fishing Boat','boat','#ffc800'],['帆船阿帆','Sail Boat','boat','#e8e8e8'],
-  ['拯溺船','Life Boat','boat','#d62828'],['遊艇阿遊','Yacht','boat','#7048e8'],
-  ['消防船','Fire Boat','boat','#c0392b'],['潛水艇','Submarine','boat','#17a2b8'],
-  ['噴射船','Jet Boat','boat','#ff7a1a'],['拖船阿拖','Tug Boat','boat','#ffd21a'],
-  ['觀光船','Tour Boat','boat','#2f9e6b'],['賽艇阿賽','Race Boat','boat','#1f4e9b'],
-  ['風帆阿風','Wind Sail','boat','#7ad1ff'],['郵輪阿郵','Cruise','boat','#e64980']
+  ['雙層巴士','Double-Decker Bus','bus','#ff7a1a'],
+  ['電車','Tram','tram','#c0392b'],
+  ['紅的','Taxi','car','#d62828'],
+  ['港鐵列車','MTR Train','train','#1f4e9b'],
+  ['綠色小巴','Minibus','bus','#2f9e6b'],
+  ['渡輪','Ferry','boat','#17a2b8'],
+  ['校車','School Bus','bus','#ffc800'],
+  ['郵政速遞車','Postal Van','car','#1f4e9b'],
+  ['電單車','Motorbike','bike','#333333'],
+  ['旅遊巴','Tour Bus','bus','#7048e8'],
+  ['機場巴士','Airport Bus','bus','#0099cc'],
+  ['搬屋貨車','Moving Truck','truck','#8a5a2b'],
+  ['飲品車','Beverage Truck','truck','#e64980'],
+  ['麵包車','Van','car','#b0b0b0'],
+  ['農耕車','Tractor','bulldozer','#37b24d'],
+  ['清障車','Recovery Truck','truck','#555555'],
+  ['觀光艇','Tour Boat','boat','#2f9e6b'],
+  ['書店車','Bookmobile','bus','#9a3b8f']
 ];
 b6.forEach(function(a,i){ pushCar({id:'r6_'+i, book:'b6', name:a[0], en:a[1], kind:a[2], body:a[3]}); });
 
