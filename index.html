@@ -54,6 +54,15 @@
   .howto .c{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:16px;}
   .howto .c b{color:var(--red);font-size:18px;}
   .howto .c p{margin:6px 0 0;font-size:15px;color:#5a4a36;}
+  /* book tabs (catalog + sticker) */
+  .booktabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px;}
+  .tab{
+    font-size:15px;font-weight:700;color:#fff;background:rgba(31,78,155,.22);
+    border:2px solid var(--blue);border-radius:999px;padding:8px 14px;cursor:pointer;
+  }
+  .tab:active{transform:translateY(2px);}
+  .tab.active{background:var(--blue);}
+  .tab .tcount{background:rgba(255,255,255,.32);border-radius:999px;padding:0 7px;font-size:13px;}
   /* grid of cards */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
   .card{
@@ -63,7 +72,7 @@
   .card:active{transform:scale(.97);}
   .card .pic{
     background:radial-gradient(circle at 50% 35%,#fff,#ffeccb);
-    border-radius:16px;padding:6px;display:flex;justify-content:center;
+    border-radius:16px;padding:6px;display:flex;justify-content:center;position:relative;
   }
   .card .pic svg{width:100%;height:auto;max-width:230px;}
   .card h3{margin:10px 0 2px;font-size:19px;color:var(--ink);}
@@ -72,9 +81,6 @@
     display:inline-block;font-size:13px;font-weight:700;color:#fff;
     background:var(--red);border-radius:999px;padding:2px 10px;margin-bottom:6px;
   }
-  .card ul{margin:6px 0 0;padding-left:18px;font-size:14px;color:#4a3f2e;}
-  .card ul li{margin:2px 0;}
-  .chip{display:inline-block;font-size:13px;font-weight:700;border-radius:8px;padding:2px 8px;margin:2px 4px 0 0;color:#fff;}
   /* sticker book */
   .book{
     background:var(--card);border:4px dashed var(--red);border-radius:22px;
@@ -82,7 +88,7 @@
   }
   .progress{height:22px;background:#ffe2b8;border-radius:999px;overflow:hidden;margin:6px 0 14px;}
   .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--red));width:0;transition:width .4s;}
-  .stickers{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:14px;}
+  .stickers{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:14px;}
   .stk{text-align:center;}
   .stk .frame{
     background:radial-gradient(circle at 50% 35%,#fff,#ffeccb);
@@ -101,15 +107,24 @@
   .qtext{font-size:clamp(19px,4.4vw,26px);font-weight:800;color:var(--ink);margin:4px 0 14px;}
   .symbols{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 0 16px;}
   .symbols svg{width:46px;height:46px;}
+  .car-sym{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:6px 0 16px;}
+  .car-sym svg,.car-sym img{width:64px;height:auto;}
+  .money-q{display:flex;justify-content:center;margin:8px 0 16px;}
+  .mrow{display:flex;gap:3px;flex-wrap:wrap;align-items:center;justify-content:center;}
+  .mrow svg{width:38px;height:38px;}
+  .mcap{font-size:13px;font-weight:800;color:#7a6647;text-align:center;margin-top:2px;}
+  .money-target{font-size:clamp(26px,6vw,34px);font-weight:800;color:var(--red);background:#fff3b0;border:3px dashed var(--red);border-radius:14px;padding:8px 18px;}
   .qcar{display:flex;justify-content:center;margin:4px 0 14px;}
   .qcar svg{width:min(260px,70%);height:auto;}
   .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;}
   .opt{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
     font-size:clamp(18px,4vw,24px);font-weight:800;color:var(--ink);
     background:#fff;border:3px solid var(--blue);border-radius:16px;
     padding:14px 8px;cursor:pointer;box-shadow:var(--shadow);
   }
   .opt:active{transform:translateY(3px);box-shadow:none;}
+  .opt svg{width:40px;height:40px;}
   .opt.correct{background:var(--good);color:#fff;border-color:#1c7a42;}
   .opt.wrong{background:#e3563f;color:#fff;border-color:#b53b27;}
   .feedback{text-align:center;font-size:20px;font-weight:800;margin:14px 0 4px;min-height:26px;}
@@ -139,9 +154,7 @@
   .speak-btn{display:inline-flex;align-items:center;gap:6px;margin:0 auto 12px;font-size:15px;font-weight:700;
     color:#fff;background:#1f4e9b;border:none;border-radius:12px;padding:8px 16px;box-shadow:var(--shadow);cursor:pointer;}
   .speak-btn:active{transform:translateY(2px);box-shadow:none;}
-  /* 用家自訂圖片（個人使用，不外傳） */
-  .card .pic{position:relative;}
-  #heroCar{position:relative;}
+  /* 用家自訂圖片 */
   .photobtn{position:absolute;top:6px;right:6px;width:34px;height:34px;border-radius:50%;border:none;
     background:rgba(31,78,155,.92);color:#fff;font-size:16px;cursor:pointer;padding:0;
     box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;}
@@ -153,8 +166,7 @@
 <body>
 <nav><div class="row">
   <a href="#how">點玩</a>
-  <a href="#forms">麥坤形態</a>
-  <a href="#friends">麥坤朋友</a>
+  <a href="#catalog">車型圖鑑</a>
   <a href="#book">貼紙簿</a>
   <a href="#quiz">玩遊戲</a>
 </div></nav>
@@ -162,7 +174,7 @@
 <header class="hero">
   <span class="hero-badge">5歲都可以玩！</span>
   <h1>麥坤圖鑑小學堂</h1>
-  <p>同閃電麥坤一齊認顏色、數數字、學英文，答對題目就攞麥坤貼紙，集齊一本貼紙簿！</p>
+  <p>同閃電麥坤一齊認車、認顏色、數數字、學香港錢幣，答對題目就攞車型貼紙，集齊 6 本貼紙簿！</p>
   <div class="hero-car" id="heroCar"></div>
 </header>
 
@@ -171,34 +183,30 @@
   <section id="how">
     <h2 class="sec">點玩？</h2>
     <div class="howto">
-      <div class="c"><b>1. 睇圖鑑</b><p>睇麥坤唔同嘅樣，同埋佢嘅好朋友。認顏色、認數字 95。</p></div>
-      <div class="c"><b>2. 玩遊戲</b><p>數圖案、跟規律（例如 1 粒星 = 2 個正方形）、認角色。全部都係 5 歲程度。</p></div>
-      <div class="c"><b>3. 攞貼紙</b><p>答啱一題，就得到一張麥坤形狀貼紙！</p></div>
-      <div class="c"><b>4. 集貼紙簿</b><p>集齊 6 款麥坤貼紙，就完成一本貼紙簿啦！</p></div>
+      <div class="c"><b>1. 睇圖鑑</b><p>超過 100 款車！分 6 本分類睇：麥坤變身、水箱溫泉鎮、活塞杯、世界大獎賽、重型機械、飛天入水。</p></div>
+      <div class="c"><b>2. 玩遊戲</b><p>數圖案、跟規律（例如 1 粒星 = 2 個正方形）、認車、仲有香港錢幣題（5蚊+2蚊=？）。全部 5 歲程度。</p></div>
+      <div class="c"><b>3. 攞貼紙</b><p>答啱一題，就得到一張車型貼紙！</p></div>
+      <div class="c"><b>4. 集貼紙簿</b><p>6 本貼紙簿，總共 100 款車，慢慢集齊唔會咁快玩完！</p></div>
     </div>
   </section>
 
-  <section id="forms">
-    <h2 class="sec">麥坤嘅形態</h2>
-    <p class="sec-sub">麥坤喺唔同電影入面有唔同嘅樣，全部都係車號 95 添！</p>
-    <div class="grid" id="formsGrid"></div>
-  </section>
-
-  <section id="friends">
-    <h2 class="sec">麥坤出動過嘅角色</h2>
-    <p class="sec-sub">呢啲係同麥坤一齊出現過嘅朋友同對手，遊戲題目都係關於佢哋。</p>
-    <div class="grid" id="friendsGrid"></div>
+  <section id="catalog">
+    <h2 class="sec">車型圖鑑</h2>
+    <p class="sec-sub">超過 100 款車！撳下面分類睇唔同車種，撳每張圖右上角 📷 可以加自己嘅相。</p>
+    <div class="booktabs" id="catTabs"></div>
+    <div class="grid" id="catGrid"></div>
   </section>
 
   <section id="book">
-    <h2 class="sec">麥坤貼紙簿</h2>
-    <p class="sec-sub">答啱題目就會 unlock 一張麥坤貼紙，目標集齊 6 款！</p>
+    <h2 class="sec">貼紙簿（6 本）</h2>
+    <p class="sec-sub">答啱題目就 unlock 一張車型貼紙，集齊 6 本貼紙簿（共 100 款）！</p>
+    <div class="booktabs" id="bookTabs"></div>
     <div class="book">
       <div class="progress"><i id="progBar"></i></div>
       <div style="text-align:center;font-weight:800;color:#7a6647" id="progTxt"></div>
       <div class="stickers" id="stickerBook"></div>
       <div class="badge-note" id="bookNote"></div>
-      <button class="resetbtn" id="resetBtn">重設貼紙簿（家長用）</button>
+      <button class="resetbtn" id="resetBtn">重設所有貼紙簿（家長用）</button>
         <button class="resetbtn" id="resetImgsBtn">重設我嘅圖片（家長用）</button>
         <div class="sync-panel" style="margin-top:14px;border-top:2px dashed var(--line);padding-top:12px;">
           <div style="font-weight:800;color:#7a6647;">📡 我嘅圖片同步（電腦 ↔ iPad）</div>
@@ -216,7 +224,7 @@
 
   <section id="quiz">
     <h2 class="sec">玩遊戲</h2>
-    <p class="sec-sub">星、正方形、三角形、圓形——跟規律數數，答啱就有麥坤貼紙！</p>
+    <p class="sec-sub">星、正方形、三角形、圓形、香港錢幣——跟規律數數、認車、學錢，答啱就有車型貼紙！</p>
     <div class="quiz" id="quizBox"></div>
   </section>
 
@@ -245,7 +253,8 @@ function wheel(x){
 function eyeSvg(x,y){
   return '<circle cx="'+x+'" cy="'+y+'" r="7" fill="#fff"/><circle cx="'+x+'" cy="'+y+'" r="3.4" fill="#2b2b35"/>';
 }
-/* ---------- 畫車（原創 SVG） ---------- */
+function shuffle(a){ var b=a.slice(); b.sort(function(){return Math.random()-0.5;}); return b; }
+/* ---------- 畫車 / 飛機 / 船（原創 SVG） ---------- */
 function drawCar(o){
   o = o || {};
   var body = o.body || '#e32017';
@@ -257,24 +266,46 @@ function drawCar(o){
   var eye = (o.eye !== false);
   var s = '<svg viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg">';
   s += '<ellipse cx="110" cy="135" rx="86" ry="9" fill="rgba(0,0,0,.12)"/>';
+
+  if(kind==='heli'){
+    s += '<rect x="56" y="42" width="92" height="46" rx="22" fill="'+body+'"/>';
+    s += '<circle cx="150" cy="65" r="15" fill="'+roof+'"/>';
+    s += '<rect x="150" y="60" width="44" height="10" rx="5" fill="'+roof+'"/>';
+    s += '<line x1="110" y1="42" x2="110" y2="12" stroke="#555" stroke-width="3"/>';
+    s += '<line x1="74" y1="12" x2="146" y2="12" stroke="#333" stroke-width="5" stroke-linecap="round"/>';
+    s += '<line x1="74" y1="12" x2="146" y2="12" stroke="#666" stroke-width="2"/>';
+    if(eye){ s += eyeSvg(118,60)+eyeSvg(140,60); }
+    s += '</svg>';
+    return s;
+  }
+  if(kind==='boat'){
+    s += '<path d="M28,84 L192,84 L172,122 L48,122 Z" fill="'+body+'"/>';
+    s += '<rect x="92" y="42" width="36" height="42" rx="8" fill="'+roof+'"/>';
+    s += '<path d="M110,42 L150,42 L110,12 Z" fill="#fff" stroke="'+body+'" stroke-width="2"/>';
+    if(eye){ s += eyeSvg(68,98)+eyeSvg(92,98); }
+    s += '</svg>';
+    return s;
+  }
+  // 地面車（有轆）
   s += wheel(62) + wheel(158);
-  s += '<rect x="26" y="72" width="168" height="40" rx="18" fill="'+body+'"/>';
-  if(kind==='truck'){
+  if(kind==='bulldozer'){
+    s += '<rect x="30" y="78" width="160" height="34" rx="10" fill="'+body+'"/>';
+    s += '<rect x="42" y="50" width="58" height="30" rx="10" fill="'+roof+'"/>';
+    s += '<path d="M12,58 L30,58 L30,114 L8,114 Z" fill="'+shade(body,0.7)+'" stroke="#333" stroke-width="2"/>';
+    if(eye){ s += eyeSvg(58,64)+eyeSvg(80,64); }
+  } else if(kind==='truck'){
+    s += '<rect x="26" y="72" width="168" height="40" rx="18" fill="'+body+'"/>';
     s += '<rect x="36" y="44" width="66" height="32" rx="12" fill="'+roof+'"/>';
     s += '<rect x="110" y="80" width="82" height="20" rx="8" fill="'+roof+'"/>';
     s += '<path d="M196,92 q16,2 16,16" fill="none" stroke="#555" stroke-width="4" stroke-linecap="round"/>';
-  } else {
-    s += '<rect x="64" y="40" width="92" height="36" rx="15" fill="'+roof+'"/>';
-  }
-  if(kind==='truck'){
     s += '<rect x="44" y="50" width="50" height="22" rx="7" fill="#bfe3ff"/>';
-  } else {
+    if(eye){ s += eyeSvg(58,61)+eyeSvg(84,61); }
+  } else { // racer
+    s += '<rect x="26" y="72" width="168" height="40" rx="18" fill="'+body+'"/>';
+    s += '<rect x="64" y="40" width="92" height="36" rx="15" fill="'+roof+'"/>';
     s += '<rect x="72" y="46" width="76" height="24" rx="9" fill="#bfe3ff"/>';
     s += '<rect x="108" y="46" width="4" height="24" fill="'+body+'"/>';
-  }
-  if(eye){
-    if(kind==='truck'){ s += eyeSvg(58,61)+eyeSvg(84,61); }
-    else { s += eyeSvg(88,58)+eyeSvg(110,58); }
+    if(eye){ s += eyeSvg(88,58)+eyeSvg(110,58); }
   }
   if(num){
     s += '<circle cx="150" cy="92" r="14" fill="#fff" stroke="#222" stroke-width="2"/>';
@@ -319,6 +350,23 @@ function drawHeart(color){
 function drawDiamond(color){
   return '<svg viewBox="0 0 40 40"><polygon points="20,4 36,20 20,36 4,20" fill="'+(color||'#7048e8')+'" stroke="rgba(0,0,0,.28)" stroke-width="2" stroke-linejoin="round"/></svg>';
 }
+/* ---------- 香港錢幣 SVG ---------- */
+function drawCoin(v){
+  var c = {1:'#cfcfcf',2:'#d8d8d8',5:'#c9c9c9',10:'#e8c34a'}[v] || '#d8d8d8';
+  var r = (v===10)?20:(v>=5?17:14);
+  return '<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="'+r+'" fill="'+c+'" stroke="#999" stroke-width="2"/>'
+    +'<text x="22" y="27" font-size="14" font-weight="800" text-anchor="middle" fill="#444">$'+v+'</text></svg>';
+}
+function comboTotal(list){ var s=0; for(var i=0;i<list.length;i++) s+=list[i]; return s; }
+function greedyCombo(t){
+  var list=[]; var den=[10,5,2,1];
+  for(var i=0;i<den.length;i++){ while(t>=den[i]){ list.push(den[i]); t-=den[i]; } }
+  return list;
+}
+function comboHtml(list){
+  var total=comboTotal(list);
+  return '<div class="mrow">'+ list.map(function(v){return drawCoin(v);}).join('') +'</div><div class="mcap">$'+total+'</div>';
+}
 /* ---------- 圖形字典（中英名 + 顏色 + 畫法） ---------- */
 var SHAPE = {
   star:    {zh:'星',     en:'star',     color:'#ffd21a', draw:drawStar},
@@ -342,36 +390,119 @@ function speakEN(txt){
   }catch(e){}
 }
 
-/* ---------- 資料：麥坤形態 ---------- */
-var forms = [
-  {id:'classic', name:'經典麥坤', en:'Classic Rust-eze', movie:'Cars 1', body:'#e32017', num:'95', lightning:true, learn:['紅色 red','車號 95','閃電 lightning']},
-  {id:'wgp', name:'世界大賽麥坤', en:'World Grand Prix', movie:'Cars 2', body:'#e32017', num:'95', headlight:true, flame:true, learn:['有真正車頭燈','火焰花紋','一樣係 95']},
-  {id:'trainer', name:'教練麥坤', en:'Cars 3 Trainer', movie:'Cars 3', body:'#e32017', num:'95', lightning:true, learn:['做 Cruz 嘅師傅','教人點 race','車號 95']},
-  {id:'primer', name:'灰色底漆麥坤', en:'Primer McQueen', movie:'Cars 3', body:'#9a9a9a', num:'95', learn:['灰色 = 未上色','意外之後','會再變返紅']},
-  {id:'mud', name:'泥漿麥坤', en:'Chester Whipplefilter', movie:'Cars 3', body:'#6b4f2a', num:'95', learn:['用泥遮住自己','去玩 demolition','唔俾人認出']},
-  {id:'fabulous', name:'藍色麥坤', en:'Fabulous Lightning McQueen', movie:'Cars 3', body:'#1f4e9b', num:'95', learn:['藍色 blue','致敬 Doc Hudson','好有心思']}
+/* ================= 資料：6 本貼紙簿 + 100 款車 ================= */
+var BOOKS = [
+  {id:'b1', name:'麥坤變身冊',   sub:'閃電麥坤嘅 6 款型態'},
+  {id:'b2', name:'水箱溫泉鎮',   sub:'麥坤嘅好朋友同小鎮車'},
+  {id:'b3', name:'活塞杯賽車',   sub:'各路賽車手'},
+  {id:'b4', name:'世界大獎賽',   sub:'來自世界各地嘅賽車'},
+  {id:'b5', name:'重型機械隊',   sub:'工程車同救援車'},
+  {id:'b6', name:'飛天入水隊',   sub:'飛機同船'}
 ];
 
-/* ---------- 資料：麥坤出動過嘅角色 ---------- */
-var friends = [
-  {id:'mater', name:'拖車阿麥', en:'Mater', type:'拖車 tow truck', body:'#7a5a32', kind:'truck', rel:'最佳朋友', fact:'鍾意講笑話，好好玩'},
-  {id:'sally', name:'莎莉', en:'Sally Carrera', type:'跑車 sports car', body:'#2a7de1', kind:'racer', rel:'女朋友', fact:'來自加州，好叻'},
-  {id:'doc', name:'韓德士醫生', en:'Doc Hudson', type:'藍色跑車', body:'#1f4e9b', kind:'racer', rel:'師父', fact:'以前係冠軍車'},
-  {id:'cruz', name:'嘉露斯', en:'Cruz Ramirez', type:'黃色跑車', body:'#ffc800', kind:'racer', rel:'徒弟', fact:'充滿活力嘅女車'},
-  {id:'ramone', name:'雷蒙', en:'Ramone', type:'經常換色嘅車', body:'#1f9bd6', kind:'racer', rel:'Radiator Springs 朋友', fact:'最鍾意噴漆'},
-  {id:'luigi', name:'路易仔', en:'Luigi', type:'意大利車', body:'#f2c200', kind:'racer', rel:'車軚店老闆', fact:'鍾意意大利粉'},
-  {id:'fillmore', name:'花律', en:'Fillmore', type:'和平車', body:'#3fae5a', kind:'truck', rel:'和平主義者', fact:'食有機嘢最健康'},
-  {id:'sarge', name:'沙治', en:'Sarge', type:'軍車', body:'#4e6b2a', kind:'truck', rel:'老兵', fact:'好守規矩'},
-  {id:'sheriff', name:'警長', en:'Sheriff', type:'警車', body:'#3a3a3a', kind:'truck', rel:'小鎮警察', fact:'睇住大家安全'},
-  {id:'red', name:'紅色消防車', en:'Red', type:'消防車', body:'#d62828', kind:'truck', rel:'默默付出', fact:'鍾意淋花'},
-  {id:'chick', name:'積克', en:'Chick Hicks', type:'綠色跑車', body:'#3fa535', kind:'racer', rel:'對手', fact:'常常唔守規矩'},
-  {id:'storm', name:'積遜暴風', en:'Jackson Storm', type:'黑藍跑車', body:'#222a44', kind:'racer', rel:'新對手', fact:'好快好叻嘅新車'}
+var CARS = [];
+function pushCar(o){ CARS.push(o); }
+
+/* Book 1 — 麥坤 6 款型態（官方圖，dpaste seed 載入） */
+pushCar({id:'classic', book:'b1', name:'經典麥坤', en:'Classic McQueen', kind:'racer', body:'#e32017', num:'95', lightning:true, tag:'Cars 1'});
+pushCar({id:'wgp', book:'b1', name:'世界大賽麥坤', en:'World Grand Prix', kind:'racer', body:'#e32017', num:'95', headlight:true, tag:'Cars 2'});
+pushCar({id:'trainer', book:'b1', name:'教練麥坤', en:'Trainer McQueen', kind:'racer', body:'#e32017', num:'95', lightning:true, tag:'Cars 3'});
+pushCar({id:'primer', book:'b1', name:'灰色底漆麥坤', en:'Primer McQueen', kind:'racer', body:'#9a9a9a', num:'95', tag:'Cars 3'});
+pushCar({id:'mud', book:'b1', name:'泥漿麥坤', en:'Mud McQueen', kind:'racer', body:'#6b4f2a', num:'95', tag:'Cars 3'});
+pushCar({id:'fabulous', book:'b1', name:'藍色麥坤', en:'Fabulous McQueen', kind:'racer', body:'#1f4e9b', num:'95', tag:'Cars 3'});
+
+/* Book 2 — 水箱溫泉鎮：12 位朋友（官方圖）+ 8 位小鎮原創車 */
+var f2 = [
+  ['mater','拖車阿麥','Mater','truck','#7a5a32'],
+  ['sally','莎莉','Sally Carrera','racer','#2a7de1'],
+  ['doc','韓德士醫生','Doc Hudson','racer','#1f4e9b'],
+  ['cruz','嘉露斯','Cruz Ramirez','racer','#ffc800'],
+  ['ramone','雷蒙','Ramone','racer','#1f9bd6'],
+  ['luigi','路易仔','Luigi','racer','#f2c200'],
+  ['fillmore','花律','Fillmore','truck','#3fae5a'],
+  ['sarge','沙治','Sarge','truck','#4e6b2a'],
+  ['sheriff','警長','Sheriff','truck','#3a3a3a'],
+  ['red','紅色消防車','Red','truck','#d62828'],
+  ['chick','積克','Chick Hicks','racer','#3fa535'],
+  ['storm','積遜暴風','Jackson Storm','racer','#222a44']
 ];
+f2.forEach(function(a){ pushCar({id:a[0], book:'b2', name:a[1], en:a[2], kind:a[3], body:a[4]}); });
+var rs2 = [
+  ['lizzie','莉茲','Lizzie','racer','#7a3b8f'],
+  ['stanley','史丹利','Stanley','truck','#9a9a9a'],
+  ['flo','科樂','Flo','racer','#e64980'],
+  ['guido','古義多','Guido','racer','#1f9bd6'],
+  ['tex','特克斯','Tex','truck','#b8160f'],
+  ['mia','美亞','Mia','racer','#e64980'],
+  ['tia','提亞','Tia','racer','#7048e8'],
+  ['boost','布斯','Boost','racer','#37b24d']
+];
+rs2.forEach(function(a){ pushCar({id:a[0], book:'b2', name:a[1], en:a[2], kind:a[3], body:a[4]}); });
+
+/* Book 3 — 活塞杯賽車（18 款原創賽車） */
+var b3 = [
+  ['紅火雷','Red Bolt','#e32017',3],['藍箭','Blue Arrow','#1f4e9b',7],['黃蜂','Yellow Bee','#ffc800',11],
+  ['綠巨人','Green Giant','#37b24d',5],['紫電','Purple Thunder','#7048e8',9],['橙飈','Orange Zoom','#ff7a1a',14],
+  ['黑豹','Black Panther','#2b2b35',2],['銀光','Silver Light','#b0b0b0',8],['金旋風','Gold Tornado','#e8c34a',1],
+  ['粉紅俏','Pink Charm','#e64980',6],['青松','Cyan Pine','#17a2b8',12],['啡風','Brown Wind','#8a5a2b',4],
+  ['白雲','White Cloud','#e8e8e8',10],['烈焰','Flame','#ff4500',23],['冰藍','Ice Blue','#7ad1ff',17],
+  ['魅影','Shadow','#4b3b6b',19],['閃光','Flash','#ffd21a',95],['疾風','Gale','#2f9e6b',21]
+];
+b3.forEach(function(a,i){ pushCar({id:'r3_'+i, book:'b3', name:a[0], en:a[1], kind:'racer', body:a[2], num:''+a[3]}); });
+
+/* Book 4 — 世界大獎賽（18 款，以 Cars 2 國際賽車為藍本） */
+var b4 = [
+  ['法蘭西斯科','Francesco Bernoulli','#c0392b',1],['戶田朱里','Shu Todoroki','#c0392b',7],['繞圈兒','Raoul ÇaRoule','#2f9e6b',6],
+  ['傑夫','Jeff Gorvette','#c0392b',9],['路易斯','Lewis Hamilton','#1f4e9b',2],['米高','Miguel Camino','#c0392b',5],
+  ['力普','Rip Clutchgoneski','#17a2b8',4],['卡拉','Carla Veloso','#e64980',8],['尼高','Nigel Gearsley','#1f4e9b',9],
+  ['麥斯','Max Schnell','#1f4e9b',3],['龍哥','Long Ge','#c0392b',11],['布魯斯','Bruce Boxmann','#1f4e9b',12],
+  ['禪一','Zen-ichi','#c0392b',14],['里奧','Rio','#2f9e6b',15],['阿歷斯','Alex','#7048e8',16],
+  ['丹尼','Denny','#ff7a1a',18],['奧圖','Otto','#ffc800',20],['卡爾','Karl','#37b24d',22]
+];
+b4.forEach(function(a,i){ pushCar({id:'r4_'+i, book:'b4', name:a[0], en:a[1], kind:'racer', body:a[2], num:''+a[3]}); });
+
+/* Book 5 — 重型機械隊（20 款工程／救援車） */
+var b5 = [
+  ['推土機阿力','Bulldozer Ali','bulldozer','#f2c200'],['吊臂車大鉗','Crane Clip','truck','#ff7a1a'],
+  ['消防車紅利','Fire Truck','truck','#d62828'],['警車阿Sir','Police Car','truck','#2b2b35'],
+  ['垃圾車清哥','Bin Truck','truck','#37b24d'],['石屎車阿泥','Cement Mixer','truck','#b0b0b0'],
+  ['貨櫃車阿櫃','Container','truck','#1f4e9b'],['救護車白仔','Ambulance','truck','#e8e8e8'],
+  ['鏟雪車雪哥','Snow Plow','bulldozer','#7ad1ff'],['挖掘機阿挖','Digger','bulldozer','#ffc800'],
+  ['油罐車阿油','Tanker','truck','#e64980'],['灑水車水哥','Water Truck','truck','#17a2b8'],
+  ['軍車沙治','Sarge Jr','truck','#4e6b2a'],['郵件車阿郵','Mail Truck','truck','#1f4e9b'],
+  ['雪糕車阿冰','Ice Cream','truck','#e64980'],['搬運車阿搬','Mover','truck','#8a5a2b'],
+  ['清道夫阿掃','Sweeper','truck','#ffd21a'],['工程車阿工','Builder','bulldozer','#ff7a1a'],
+  ['吊運車阿吊','Lifter','truck','#7048e8'],['救援車阿救','Rescue','truck','#d62828']
+];
+b5.forEach(function(a,i){ pushCar({id:'r5_'+i, book:'b5', name:a[0], en:a[1], kind:a[2], body:a[3]}); });
+
+/* Book 6 — 飛天入水隊（18 款飛機／船） */
+var b6 = [
+  ['直昇機阿升','Heli Up','heli','#1f4e9b'],['救援直昇機','Rescue Heli','heli','#d62828'],
+  ['警察直昇機','Police Heli','heli','#2b2b35'],['新聞直昇機','News Heli','heli','#17a2b8'],
+  ['小艇阿波','Boat Wave','boat','#1f4e9b'],['快艇阿快','Speed Boat','boat','#e32017'],
+  ['漁船阿漁','Fishing Boat','boat','#ffc800'],['帆船阿帆','Sail Boat','boat','#e8e8e8'],
+  ['拯溺船','Life Boat','boat','#d62828'],['遊艇阿遊','Yacht','boat','#7048e8'],
+  ['消防船','Fire Boat','boat','#c0392b'],['潛水艇','Submarine','boat','#17a2b8'],
+  ['噴射船','Jet Boat','boat','#ff7a1a'],['拖船阿拖','Tug Boat','boat','#ffd21a'],
+  ['觀光船','Tour Boat','boat','#2f9e6b'],['賽艇阿賽','Race Boat','boat','#1f4e9b'],
+  ['風帆阿風','Wind Sail','boat','#7ad1ff'],['郵輪阿郵','Cruise','boat','#e64980']
+];
+b6.forEach(function(a,i){ pushCar({id:'r6_'+i, book:'b6', name:a[0], en:a[1], kind:a[2], body:a[3]}); });
+
+function carsOfBook(bid){ return CARS.filter(function(c){ return c.book===bid; }); }
+function bookName(bid){ for(var i=0;i<BOOKS.length;i++){ if(BOOKS[i].id===bid) return BOOKS[i].name; } return bid; }
+function carSvgFn(c){
+  return function(){ return drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight}); };
+}
+function carThumb(c){
+  var img = imgData(c.id);
+  return img ? '<img class="quserimg" src="'+img+'" alt="">' : drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight});
+}
 
 /* ---------- 用家自訂圖片（可雲端同步 + 匯出/匯入，私隱見 footer） ---------- */
 var UIMGS_KEY = 'mcqueen_user_imgs_v2';
 // 官方角色圖 seed（匿名 dpaste，不可改；圖以 base64 存，app 開網頁自動 pull，任何裝置都見到）
-
 var SEED_URL = 'https://dpaste.com/9265R49KH.txt';
 
 function loadUserImgs(){
@@ -379,7 +510,6 @@ function loadUserImgs(){
     var obj = JSON.parse(localStorage.getItem(UIMGS_KEY)||'{}');
     var out = {};
     for(var k in obj){ if(!obj.hasOwnProperty(k)) continue;
-      // 兼容舊格式 {id: dataURL}
       if(typeof obj[k]==='string'){ out[k]={d:obj[k], t:0}; }
       else { out[k]=obj[k]; }
     }
@@ -388,19 +518,14 @@ function loadUserImgs(){
 }
 function saveUserImgs(){ try{ localStorage.setItem(UIMGS_KEY, JSON.stringify(userImgs)); }catch(e){} }
 var userImgs = loadUserImgs();
-
-// 取圖 dataURL
 function imgData(id){ return (userImgs[id] && userImgs[id].d) ? userImgs[id].d : null; }
-// 設圖（更新 timestamp，用嚟決定邊邊新）
 function setImg(id, dataURL){ userImgs[id] = { d: dataURL, t: Date.now() }; saveUserImgs(); }
-// 刪圖
 function delImg(id){ delete userImgs[id]; saveUserImgs(); }
 
 /* ---- 雲端同步（按 timestamp 合併，唔會互蓋） ---- */
 var _syncing = false;
 function setSyncStatus(txt){ var el=document.getElementById('syncStatus'); if(el) el.textContent=txt; }
 function pushToCloud(){
-  // 雲端 seed 係不可改（dpaste），用家私人圖片只留部機 + 匯出/匯入，所以唔做雲推送
   return Promise.resolve(true);
 }
 function pullFromCloud(){
@@ -423,12 +548,10 @@ function pullFromCloud(){
     .catch(function(){ return false; });
 }
 function refreshAllPics(){
-  forms.forEach(function(f){ var p=document.querySelector('[data-pic="'+f.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(f.id,p._svgFn); });
-  friends.forEach(function(fr){ var p=document.querySelector('[data-pic="'+fr.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(fr.id,p._svgFn); });
+  CARS.forEach(function(c){ var p=document.querySelector('[data-pic="'+c.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(c.id,p._svgFn); });
   var hp=document.querySelector('[data-pic="hero"]'); if(hp&&hp._svgFn) hp.innerHTML=picInner('hero',hp._svgFn);
-  renderBook();
+  renderCatGrid(); renderBook();
 }
-
 function picInner(id, svgFn){
   var img = imgData(id);
   var body = img ? '<img class="userimg" src="'+img+'" alt="">' : svgFn();
@@ -479,71 +602,78 @@ function refreshCardPic(id){
   el.querySelector('.pic')._svgFn = svgFn;
 })();
 
-/* ---------- 渲染：形態 ---------- */
-(function(){
-  var g = document.getElementById('formsGrid');
-  forms.forEach(function(f){
-    var chips = f.learn.map(function(t){return '<span class="chip" style="background:'+ (t.indexOf('紅')>=0?'#e32017':t.indexOf('藍')>=0?'#1f4e9b':t.indexOf('灰')>=0?'#888':'#37b24d') +'">'+t+'</span>';}).join('');
-    var svgFn = function(){ return drawCar({body:f.body, num:f.num, lightning:f.lightning, headlight:f.headlight, kind:'racer'}); };
-    var div = document.createElement('div');
-    div.className='card';
-    div.innerHTML = '<div class="pic" data-pic="'+f.id+'">'+picInner(f.id, svgFn)+'</div>'
-      + '<span class="tag">'+f.movie+'</span>'
-      + '<h3>'+f.name+'</h3>'
-      + '<p class="en">'+f.en+'</p>'
-      + '<div>'+chips+'</div>';
+/* ---------- 渲染：車型圖鑑（分頁） ---------- */
+var catBook = 'b1';
+function renderCatTabs(){
+  var el = document.getElementById('catTabs'); el.innerHTML='';
+  BOOKS.forEach(function(b){
+    var btn=document.createElement('button');
+    btn.className='tab'+(b.id===catBook?' active':'');
+    btn.innerHTML = b.name+' <span class="tcount">'+carsOfBook(b.id).length+'</span>';
+    btn.onclick=function(){ catBook=b.id; renderCatTabs(); renderCatGrid(); };
+    el.appendChild(btn);
+  });
+}
+function renderCatGrid(){
+  var g=document.getElementById('catGrid'); g.innerHTML='';
+  carsOfBook(catBook).forEach(function(c){
+    var svgFn=carSvgFn(c);
+    var div=document.createElement('div'); div.className='card';
+    div.innerHTML = '<div class="pic" data-pic="'+c.id+'">'+picInner(c.id, svgFn)+'</div>'
+      + (c.tag? '<span class="tag">'+c.tag+'</span>':'')
+      + '<h3>'+c.name+'</h3>'
+      + '<p class="en">'+c.en+'</p>';
     g.appendChild(div);
     div.querySelector('.pic')._svgFn = svgFn;
   });
-})();
+}
 
-/* ---------- 渲染：朋友 ---------- */
-(function(){
-  var g = document.getElementById('friendsGrid');
-  friends.forEach(function(fr){
-    var svgFn = function(){ return drawCar({body:fr.body, kind:fr.kind, num:''}); };
-    var div = document.createElement('div');
-    div.className='card';
-    div.innerHTML = '<div class="pic" data-pic="'+fr.id+'">'+picInner(fr.id, svgFn)+'</div>'
-      + '<h3>'+fr.name+'</h3>'
-      + '<p class="en">'+fr.en+'</p>'
-      + '<ul><li><b>係咩車：</b>'+fr.type+'</li>'
-      + '<li><b>同麥坤：</b>'+fr.rel+'</li>'
-      + '<li><b>趣趣：</b>'+fr.fact+'</li></ul>';
-    g.appendChild(div);
-    div.querySelector('.pic')._svgFn = svgFn;
+/* ================= 貼紙簿（6 本）+ 遊戲 ================= */
+var STKEY = 'mcqueen_stickers_v2';
+function loadEarned(){ try{ return JSON.parse(localStorage.getItem(STKEY))||{}; }catch(e){ return {}; } }
+function saveEarned(){ try{ localStorage.setItem(STKEY, JSON.stringify(earnedBooks)); }catch(e){} }
+var earnedBooks = loadEarned();
+var currentBook = 'b1';
+
+function renderBookTabs(){
+  var el=document.getElementById('bookTabs'); el.innerHTML='';
+  BOOKS.forEach(function(b){
+    var cars=carsOfBook(b.id); var earned=earnedBooks[b.id]||0;
+    var btn=document.createElement('button');
+    btn.className='tab'+(b.id===currentBook?' active':'');
+    btn.innerHTML=b.name+' <span class="tcount">'+earned+'/'+cars.length+'</span>';
+    btn.onclick=function(){ currentBook=b.id; renderBookTabs(); renderBook(); };
+    el.appendChild(btn);
   });
-})();
-
-/* ================= 貼紙簿 + 遊戲 ================= */
-var STKEY = 'mcqueen_stickers_v1';
-function loadEarned(){ try{ var n = parseInt(localStorage.getItem(STKEY),10); return isNaN(n)?0:Math.min(n, forms.length); }catch(e){ return 0; } }
-function saveEarned(n){ try{ localStorage.setItem(STKEY, n); }catch(e){} }
-var earned = loadEarned();
-
+}
 function renderBook(){
-  var box = document.getElementById('stickerBook');
-  box.innerHTML='';
-  forms.forEach(function(f, i){
-    var got = i < earned;
-    var d = document.createElement('div');
-    d.className = 'stk' + (got?'':' locked');
-    d.innerHTML = '<div class="frame">'+(imgData(f.id) ? '<img class="userimg" src="'+imgData(f.id)+'" alt="">' : drawCar({body:f.body, num:f.num, lightning:f.lightning, headlight:f.headlight, kind:'racer'}))+'</div>'
-      + '<div class="nm">'+(got? f.name : '未解鎖')+'</div>';
+  var cars=carsOfBook(currentBook);
+  var earned=earnedBooks[currentBook]||0;
+  var box=document.getElementById('stickerBook'); box.innerHTML='';
+  cars.forEach(function(c,i){
+    var got=i<earned;
+    var d=document.createElement('div'); d.className='stk'+(got?'':' locked');
+    var pic = imgData(c.id) ? '<img class="userimg" src="'+imgData(c.id)+'" alt="">' : drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight});
+    d.innerHTML='<div class="frame">'+pic+'</div><div class="nm">'+(got?c.name:'未解鎖')+'</div>';
     box.appendChild(d);
   });
-  var pct = Math.round(earned/forms.length*100);
-  document.getElementById('progBar').style.width = pct+'%';
-  document.getElementById('progTxt').textContent = '已集 '+earned+' / '+forms.length+' 款 （'+pct+'%）';
-  var note = document.getElementById('bookNote');
-  if(earned >= forms.length){
-    note.innerHTML = '恭喜晒！你已經集齊整本麥坤貼紙簿，好叻呀！';
-  } else {
-    note.innerHTML = '再答啱 '+(forms.length-earned)+' 題，就可以集齊整本貼紙簿啦！';
+  var pct=Math.round(earned/cars.length*100);
+  document.getElementById('progBar').style.width=pct+'%';
+  document.getElementById('progTxt').textContent='「'+bookName(currentBook)+'」已集 '+earned+' / '+cars.length+' 款 （'+pct+'%）';
+  var note=document.getElementById('bookNote');
+  if(earned>=cars.length){ note.innerHTML='恭喜！「'+bookName(currentBook)+'」集齊晒，好叻呀！'; }
+  else { note.innerHTML='再答啱 '+(cars.length-earned)+' 題，就集多一本貼紙簿啦！'; }
+}
+function nextIncompleteBook(from){
+  for(var step=1; step<=BOOKS.length; step++){
+    var idx=(BOOKS.indexOf(BOOKS.filter(function(b){return b.id===from;})[0])+step)%BOOKS.length;
+    var b=BOOKS[idx];
+    if((earnedBooks[b.id]||0) < carsOfBook(b.id).length) return b.id;
   }
+  return null;
 }
 document.getElementById('resetBtn').addEventListener('click', function(){
-  earned = 0; saveEarned(0); renderBook();
+  earnedBooks={}; saveEarned(); currentBook='b1'; renderBookTabs(); renderBook();
 });
 document.getElementById('resetImgsBtn').addEventListener('click', function(){
   userImgs = {}; saveUserImgs();
@@ -598,64 +728,52 @@ if(_importFile){ _importFile.addEventListener('change', function(){
   _importFile.value='';
 }); }
 
-/* ---------- 題目庫 ---------- */
+/* ================= 題目庫（每次生成約 100 條） ================= */
+function opt(v, html){ return {v:v, html:html}; }
+
 function countQ(shape, n){
-  var sym = (shape==='star')? drawStar('#ffd21a') : drawTri('#37b24d');
-  var html=''; for(var i=0;i<n;i++) html+=sym;
-  // 4 個唔同嘅選項（答案 + 3 個干擾，範圍 1–9）
-  var opts = [n];
-  var cand = [];
-  for(var k=1;k<=9;k++){ if(k!==n) cand.push(k); }
-  cand.sort(function(){return Math.random()-0.5;});
-  opts = opts.concat(cand.slice(0,3));
-  return {
-    type:'count', symbol:true,
-    text: (shape==='star'? '數數有幾多粒星？' : '數數有幾多個三角形？'),
-    symbols: html,
-    answer: n,
-    opts: opts
-  };
+  var draw = (shape==='star')? drawStar : drawTri;
+  var color = (shape==='star')? '#ffd21a':'#37b24d';
+  var sym=''; for(var i=0;i<n;i++) sym+=draw(color);
+  var opts=[opt(n,''+n)];
+  var cand=[]; for(var k=1;k<=10;k++){ if(k!==n) cand.push(k); }
+  shuffle(cand).slice(0,3).forEach(function(k){ opts.push(opt(k,''+k)); });
+  return {type:'count', symbol:true,
+    text:(shape==='star'?'數數有幾多粒星？':'數數有幾多個三角形？'),
+    symbols:sym, answer:n, opts:shuffle(opts)};
+}
+function countCarsQ(){
+  var n = 1+Math.floor(Math.random()*9);
+  var cars=[]; for(var i=0;i<n;i++){ cars.push(CARS[Math.floor(Math.random()*CARS.length)]); }
+  var sym = cars.map(function(c){ return carThumb(c); }).join('');
+  var opts=[opt(n,''+n)];
+  var cand=[]; for(var k=1;k<=10;k++){ if(k!==n) cand.push(k); }
+  shuffle(cand).slice(0,3).forEach(function(k){ opts.push(opt(k,''+k)); });
+  return {type:'countcars', symbol:true, text:'數數有幾多架車？', symbols:sym, answer:n, opts:shuffle(opts)};
 }
 function patternQ(){
-  return {
-    type:'pattern', symbol:true,
-    text:'跟住規律：星、三角、星、三角、星、？ 跟住係咩？',
+  return {type:'pattern', symbol:true, text:'跟住規律：星、三角、星、三角、星、？ 跟住係咩？',
     symbols: drawStar('#ffd21a')+drawTri('#37b24d')+drawStar('#ffd21a')+drawTri('#37b24d')+drawStar('#ffd21a'),
-    answer:'triangle',
-    opts:['star','triangle']
-  };
+    answer:'triangle', opts:[opt('star',drawStar('#ffd21a')),opt('triangle',drawTri('#37b24d'))]};
 }
 function whoQ(){
-  var fr = friends[Math.floor(Math.random()*friends.length)];
-  var others = friends.filter(function(x){return x!==fr;}).sort(function(){return Math.random()-0.5;}).slice(0,2);
-  var opts = [fr].concat(others).sort(function(){return Math.random()-0.5;});
-  var carSvg = imgData(fr.id)
-    ? '<img class="quserimg" src="'+imgData(fr.id)+'" alt="">'
-    : drawCar({body:fr.body, kind:fr.kind, num:''});
-  return {
-    type:'who', car:true, carSvg: carSvg, _fid: fr.id,
-    text:'呢架車係邊個角色？',
-    answer: fr.name,
-    opts: opts.map(function(o){return o.name;})
-  };
+  var c = CARS[Math.floor(Math.random()*CARS.length)];
+  var others = CARS.filter(function(x){return x!==c;}).sort(function(){return Math.random()-0.5;}).slice(0,2);
+  var opts=[opt(c.name,c.name)].concat(others.map(function(o){return opt(o.name,o.name);}));
+  shuffle(opts);
+  var carSvg = imgData(c.id) ? '<img class="quserimg" src="'+imgData(c.id)+'" alt="">'
+                              : drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight});
+  return {type:'who', car:true, carSvg:carSvg, _fid:c.id, text:'呢架車係邊個角色？', answer:c.name, opts:opts};
 }
 function colorQ(){
-  return {
-    type:'choice',
-    text:'麥坤係咩顏色？',
-    answer:'紅色 red',
-    opts:['紅色 red','藍色 blue','黃色 yellow']
-  };
+  return {type:'choice', text:'麥坤係咩顏色？', answer:'紅色 red',
+    opts:[opt('紅色 red','紅色 red'),opt('藍色 blue','藍色 blue'),opt('黃色 yellow','黃色 yellow')]};
 }
 function numberQ(){
-  return {
-    type:'choice',
-    text:'麥坤嘅車號係幾多？',
-    answer:'95',
-    opts:['95','23','8','3']
-  };
+  return {type:'choice', text:'麥坤嘅車號係幾多？', answer:'95',
+    opts:[opt('95','95'),opt('23','23'),opt('8','8'),opt('3','3')]};
 }
-/* ---------- 比例推理題：1 粒星 = k 個正方形，如此類推 ---------- */
+/* ---------- 比例推理題（簡化：直接 1星 = k方，n星 = ?方，唔要中間範例） ---------- */
 var PAIRS = [
   {a:'star',    b:'square',   k:2},
   {a:'triangle',b:'circle',   k:2},
@@ -671,7 +789,6 @@ var PAIRS = [
 function ratioQ(){
   var p = PAIRS[Math.floor(Math.random()*PAIRS.length)];
   var k = p.k;
-  // 難度：大多 1–5 粒；k=2 時約 30% 去到 6–10；k=3 封頂 5 以防太難
   var n;
   if(k>=3){ n = 1 + Math.floor(Math.random()*5); }
   else { n = (Math.random()<0.3)? (6 + Math.floor(Math.random()*5)) : (1 + Math.floor(Math.random()*5)); }
@@ -684,47 +801,79 @@ function ratioQ(){
     else { rhs=''; for(var j=0;j<nSq;j++) rhs += sb.draw(sb.color); }
     return '<div class="prow"><div class="prow-l">'+stars+'</div><div class="peq">=</div><div class="prow-r">'+rhs+'</div></div>';
   }
-  var symbols = row(1,k) + row(2,k*2) + row(n,null);
-  // 選項：答案 + 3 個相近干擾（含「淨數星數」呢個常見錯誤）
+  var symbols = row(1,k) + row(n,null);
   var cand=[];
   function add(x){ if(x>0 && x!==answer && cand.indexOf(x)<0) cand.push(x); }
   add(n); add(answer-1); add(answer+1); add(answer-2); add(answer+2); add(n+1); add(n+k);
   while(cand.length<3){ var r=1+Math.floor(Math.random()*Math.max(20,answer+6)); add(r); }
   cand.push(answer);
-  // 英文句子
-  var en = numWord[1]+' '+plEN(sa.en,1)+' '+vbEN(1)+' '+k+' '+plEN(sb.en,k)+'. '
-         + numWord[2]+' '+plEN(sa.en,2)+' '+vbEN(2)+' '+(k*2)+' '+plEN(sb.en,k*2)+'. '
-         + numWord[n]+' '+plEN(sa.en,n)+' '+vbEN(n)+' equal how many '+plEN(sb.en,2)+'?';
-  return {
-    type:'ratio', ratio:true, symbol:true,
+  var en = 'One '+sa.en+' equals '+k+' '+plEN(sb.en,k)+'. '+n+' '+plEN(sa.en,n)+' equal how many '+plEN(sb.en,2)+'?';
+  return {type:'ratio', ratio:true, symbol:true,
     text:'跟住數：'+n+sa.zh+' 係幾多個'+sb.zh+'？',
-    sub:'1'+sa.zh+' = '+k+sb.zh+'，2'+sa.zh+' = '+(k*2)+sb.zh+'，'+n+sa.zh+' = ?'+sb.zh,
-    symbols: symbols,
-    answer: answer,
-    opts: cand.sort(function(){return Math.random()-0.5;}),
-    en: en
-  };
+    sub:'1'+sa.zh+' = '+k+sb.zh+'，'+n+sa.zh+' = ?'+sb.zh,
+    symbols:symbols, answer:answer,
+    opts:shuffle(cand.map(function(x){return opt(x,''+x);})), en:en};
 }
-var builders = [
-  ratioQ, ratioQ, ratioQ, ratioQ, ratioQ, ratioQ, ratioQ, ratioQ,  // 比例推理（主力）
-  whoQ, colorQ, numberQ,                                            // 麥坤角色/事實（保留）
-  function(){return countQ('star', 1+Math.floor(Math.random()*4));},
-  function(){return countQ('triangle', 1+Math.floor(Math.random()*4));}
-];
-var qOrder = [];
-function refill(){
-  qOrder = [];
-  for(var i=0;i<builders.length;i++) qOrder.push(i);
-  qOrder.sort(function(){return Math.random()-0.5;});
+/* ---------- 香港錢幣題（圖案揀） ---------- */
+var COINPOOL = [1,2,5,10];
+function moneyQ(){
+  var mode = Math.random()<0.5 ? 'add':'compose';
+  if(mode==='add'){
+    var a = COINPOOL[Math.floor(Math.random()*COINPOOL.length)];
+    var b = COINPOOL[Math.floor(Math.random()*COINPOOL.length)];
+    var total = a+b;
+    var correct = greedyCombo(total);
+    var opts=[opt(total, comboHtml(correct))];
+    var seen={}; seen[total]=1; var tries=0;
+    while(opts.length<4 && tries<60){
+      tries++;
+      var t = total + (Math.random()<0.5?-1:1)*(1+Math.floor(Math.random()*3));
+      if(t<1||t>20||seen[t]) continue;
+      seen[t]=1; opts.push(opt(t, comboHtml(greedyCombo(t))));
+    }
+    while(opts.length<4){ var tt=1+Math.floor(Math.random()*20); if(!seen[tt]){ seen[tt]=1; opts.push(opt(tt, comboHtml(greedyCombo(tt)))); } }
+    return {type:'money', money:true, text:'數數呢啲錢總共有幾多蚊？',
+      symbols:'<div class="mrow">'+drawCoin(a)+drawCoin(b)+'</div>',
+      answer:total, opts:shuffle(opts)};
+  } else {
+    var target = [3,4,5,6,7,8,9,10][Math.floor(Math.random()*8)];
+    var correctList = greedyCombo(target);
+    var opts=[opt(target, comboHtml(correctList))];
+    var seen2={}; seen2[target]=1; var tries2=0;
+    while(opts.length<4 && tries2<60){
+      tries2++;
+      var t2 = [3,4,5,6,7,8,9,10][Math.floor(Math.random()*8)];
+      if(seen2[t2]) continue;
+      seen2[t2]=1; opts.push(opt(t2, comboHtml(greedyCombo(t2))));
+    }
+    return {type:'money', money:true, text:''+target+'蚊 係咁樣組成嘅？撳啱嘅錢',
+      symbols:'<div class="money-target">💰 $'+target+'</div>',
+      answer:target, opts:shuffle(opts)};
+  }
 }
-var qIdx = 0;
-var curQ = null;
+
+/* ---------- 生成題庫池（約 100 條） ---------- */
+function genPool(){
+  var pool=[];
+  for(var i=0;i<24;i++) pool.push(ratioQ());
+  for(var i=0;i<14;i++) pool.push(countQ('star', 1+Math.floor(Math.random()*9)));
+  for(var i=0;i<8;i++)  pool.push(countQ('triangle', 1+Math.floor(Math.random()*9)));
+  for(var i=0;i<8;i++)  pool.push(countCarsQ());
+  for(var i=0;i<16;i++) pool.push(whoQ());
+  for(var i=0;i<8;i++)  pool.push(colorQ());
+  for(var i=0;i<6;i++)  pool.push(numberQ());
+  for(var i=0;i<6;i++)  pool.push(patternQ());
+  for(var i=0;i<16;i++) pool.push(moneyQ());
+  return shuffle(pool);
+}
+var pool=[]; var poolIdx=0;
+function refill(){ pool=genPool(); poolIdx=0; }
 function nextQ(){
-  if(qIdx >= qOrder.length){ refill(); qIdx = 0; }
-  curQ = builders[qOrder[qIdx]]();
-  qIdx++;
+  if(poolIdx>=pool.length){ refill(); }
+  curQ=pool[poolIdx]; poolIdx++;
   renderQ();
 }
+var curQ = null;
 function renderQ(){
   var box = document.getElementById('quizBox');
   var h = '';
@@ -732,16 +881,16 @@ function renderQ(){
   if(curQ.ratio){
     h += '<div class="ratio-box">'+curQ.symbols+'</div>';
     if(curQ.sub){ h += '<div class="qsub">'+curQ.sub+'</div>'; }
+  } else if(curQ.money){
+    h += '<div class="money-q">'+curQ.symbols+'</div>';
+  } else if(curQ.type==='countcars'){
+    h += '<div class="car-sym">'+curQ.symbols+'</div>';
   } else if(curQ.symbol){
     h += '<div class="symbols">'+curQ.symbols+'</div>';
   }
   if(curQ.car){ h += '<div class="qcar">'+curQ.carSvg+'</div>'; }
   if(curQ.en){ h += '<button class="speak-btn" id="speakBtn">🔊 聽英文</button>'; }
-  // options: shuffle
-  var opts = curQ.opts.slice().sort(function(){return Math.random()-0.5;});
-  var optHtml = opts.map(function(o){
-    return '<button class="opt" data-v="'+o+'">'+o+'</button>';
-  }).join('');
+  var optHtml = curQ.opts.map(function(o){ return '<button class="opt" data-v="'+o.v+'">'+o.html+'</button>'; }).join('');
   h += '<div class="opts" id="optBox">'+optHtml+'</div>';
   h += '<div class="feedback" id="fb"></div>';
   h += '<button class="nextbtn" id="nextBtn" style="display:none">下一題</button>';
@@ -753,15 +902,13 @@ function renderQ(){
       if(optBox.dataset.done) return;
       optBox.dataset.done = '1';
       var v = btn.getAttribute('data-v');
-      var correct = (v === String(curQ.answer));
-      if(correct){
+      if(String(v) === String(curQ.answer)){
         btn.classList.add('correct');
         onCorrect();
       } else {
         btn.classList.add('wrong');
-        // show correct one
         optBox.querySelectorAll('.opt').forEach(function(b){
-          if(b.getAttribute('data-v') === String(curQ.answer)) b.classList.add('correct');
+          if(String(b.getAttribute('data-v')) === String(curQ.answer)) b.classList.add('correct');
         });
         var fb = document.getElementById('fb');
         fb.className='feedback bad'; fb.textContent='差少少，再試過啦！';
@@ -777,23 +924,36 @@ function renderQ(){
 function onCorrect(){
   speakEN('Great job! You got a sticker!');
   var fb = document.getElementById('fb');
-  if(earned < forms.length){
+  var bid = currentBook;
+  var cars = carsOfBook(bid);
+  var earned = earnedBooks[bid]||0;
+  if(earned < cars.length){
     var idx = earned;
-    earned++; saveEarned(earned);
+    earnedBooks[bid] = earned+1; saveEarned();
+    var car = cars[idx];
     fb.className='feedback good';
-    fb.innerHTML = '答啱啦！得咗一張麥坤貼紙！';
-    // show the earned sticker
-    var stk = '<div class="get-sticker">'+drawCar({body:forms[idx].body, num:forms[idx].num, lightning:forms[idx].lightning, headlight:forms[idx].headlight, kind:'racer'})+'</div>';
+    fb.innerHTML = '答啱啦！得咗一張「'+bookName(bid)+'」貼紙：'+car.name+'！';
+    var stk = '<div class="get-sticker">'+carThumb(car)+'</div>';
     fb.insertAdjacentHTML('afterend', stk);
+    if(earned+1 >= cars.length){
+      fb.innerHTML += ' 🎉 集齊「'+bookName(bid)+'」整本啦！';
+      var nxt = nextIncompleteBook(bid);
+      if(nxt){ currentBook = nxt; renderBookTabs(); }
+    }
     renderBook();
   } else {
     fb.className='feedback good';
-    fb.textContent='答啱啦！貼紙簿已經集齊晒，好叻！';
+    fb.textContent='答啱啦！呢本貼紙簿已經集齊晒，好叻！';
+    var nxt2 = nextIncompleteBook(bid);
+    if(nxt2){ currentBook=nxt2; renderBookTabs(); }
     renderBook();
   }
 }
 
 /* init */
+renderCatTabs();
+renderCatGrid();
+renderBookTabs();
 renderBook();
 refill();
 nextQ();
