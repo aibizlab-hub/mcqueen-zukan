@@ -209,11 +209,10 @@
       <button class="resetbtn" id="resetBtn">重設所有貼紙簿（家長用）</button>
         <button class="resetbtn" id="resetImgsBtn">重設我嘅圖片（家長用）</button>
         <div class="sync-panel" style="margin-top:14px;border-top:2px dashed var(--line);padding-top:12px;">
-          <div style="font-weight:800;color:#7a6647;">📡 我嘅圖片同步（電腦 ↔ iPad）</div>
-          <p style="font-size:13px;color:#9a8a6c;margin:6px 0 8px;">你加嘅私人相而家會<b>自動同步</b>去匿名雲端（dpaste 相片 + jsonblob pointer，同官方圖同級別），電腦 / iPad / 電話開 app 都自動見到，唔使再匯出/匯入。相只經匿名雲、唔跟 link 出街；想 100% 私存就關下面開關，改用匯出/匯入。</p>
-          <label style="font-size:13px;color:#7a6647;display:flex;align-items:center;gap:6px;margin:2px 0 6px;cursor:pointer;"><input type="checkbox" id="syncToggle" checked> 自動雲端同步（私人相）</label>
+          <div style="font-weight:800;color:#7a6647;">📡 我嘅圖片（電腦 ↔ iPad）</div>
+          <p style="font-size:13px;color:#9a8a6c;margin:6px 0 8px;">✅ <b>官方角色圖已內建喺網站</b>，任何裝置開 app 都自動見到，唔使同步。你自己加嘅<b>私人相</b>請用「💾 備份」或「⬇️匯出圖片」存成檔案，再喺另一部機撳「⬆️匯入圖片」搬過去。雲端自動同步暫停中（dpaste 服務唔穩定，會有錯圖覆蓋風險，已停用）。</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="resetbtn" id="syncBtn">🔄 立即同步</button>
+            <button class="resetbtn" id="syncBtn">💾 備份我的圖片</button>
             <button class="resetbtn" id="exportBtn">⬇️ 匯出圖片</button>
             <button class="resetbtn" id="importBtn">⬆️ 匯入圖片</button>
           </div>
@@ -562,23 +561,20 @@ function bookName(bid){ for(var i=0;i<BOOKS.length;i++){ if(BOOKS[i].id===bid) r
 function carSvgFn(c){
   return function(){ return drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight}); };
 }
+function carById(id){ for(var i=0;i<CARS.length;i++){ if(CARS[i].id===id) return CARS[i]; } return null; }
+// 官方圖 load 失敗（未部署/網絡）時，自動轉返 SVG 插畫，唔會爆塊
+function imgErr(el, id){ var c=carById(id); if(c) el.outerHTML = drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight}); }
 function carThumb(c){
   var img = imgData(c.id);
-  return img ? '<img class="quserimg" src="'+img+'" alt="">' : drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight});
+  return img ? '<img class="quserimg" src="'+img+'" alt="" onerror="imgErr(this,\''+c.id+'\')">' : drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight});
 }
 
 /* ---------- 用家自訂圖片（可雲端同步 + 匯出/匯入，私隱見 footer） ---------- */
 var UIMGS_KEY = 'mcqueen_user_imgs_v2';
-// 官方角色圖 seed（匿名 dpaste，不可改；圖以 base64 存，app 開網頁自動 pull，任何裝置都見到）
-// 6 本貼紙簿各一個 seed URL，開 app 時全部載入合併
-var SEED_URLS = [
-  'https://dpaste.com/DUC9XTABL.txt',  // b1 麥坤變身冊 (6)
-  'https://dpaste.com/C7HHANWX7.txt',  // b2 水箱溫泉鎮 (16+)
-  'https://dpaste.com/CYW7DWSS3.txt',  // b3 活塞杯賽車
-  'https://dpaste.com/3F9KPULVV.txt',  // b4 世界大獎賽
-  'https://dpaste.com/9BBMYMDVL.txt',  // b5 次世代賽車
-  'https://dpaste.com/EW6ENYMHP.txt'   // b6 更多汽車角色
-];
+// 官方角色圖：直接 host 喺 GitHub Pages 嘅 seed/ 目錄（經你個 repo，穩陣、CORS OK、任何裝置都見到）
+// 每個角色一張 <id>.jpg，app 按 id lazy 載入。下面 HAS_OFFICIAL 由部署腳本注入（有圖嘅角色 id）。
+var OFFICIAL_BASE = 'https://aibizlab-hub.github.io/mcqueen-zukan/seed/';
+var HAS_OFFICIAL = {"mq_classic":1,"mq_wgp":1,"mq_trainer":1,"mq_primer":1,"mq_mud":1,"mq_fabulous":1,"mater":1,"sally":1,"doc":1,"ramone":1,"luigi":1,"guido":1,"fillmore":1,"sarge":1,"sheriff":1,"red":1,"flo":1,"lizzie":1,"stanley":1,"tex":1,"mia":1,"tia":1,"boost":1,"dj":1,"wingo":1,"snotrod":1,"chick":1,"king":1,"cal":1,"sage":1,"ernie":1,"slider":1,"dusty":1,"rusty":1,"darrell":1,"bobcut":1,"kori":1,"leerev":1,"claude":1,"winford":1,"misti":1,"francesco":1,"shu":1,"raoul":1,"rip":1,"max":1,"miguel":1,"jeff":1,"lewis":1,"nigel":1,"carla":1,"finn":1,"holley":1,"profz":1,"grem":1,"acer":1,"rod":1,"siddeley":1,"leland":1,"storm":1,"cruz":1,"sterling":1,"fritter":1,"danny":1,"ryan":1,"bubba":1,"chase":1,"tim":1,"bobby":1,"brick":1,"natalie":1,"smokey":1,"river":1,"junior":1,"louise":1,"arvy":1,"drdamage":1,"meldorado":1,"zil":1,"ivan":1,"otto":1,"gremlin":1,"crusty":1,"rm":1,"brent":1,"hobbs":1};
 
 function loadUserImgs(){
   try{
@@ -593,7 +589,11 @@ function loadUserImgs(){
 }
 function saveUserImgs(){ try{ localStorage.setItem(UIMGS_KEY, JSON.stringify(userImgs)); }catch(e){} }
 var userImgs = loadUserImgs();
-function imgData(id){ return (userImgs[id] && userImgs[id].d) ? userImgs[id].d : null; }
+function imgData(id){
+  if(userImgs[id] && userImgs[id].d) return userImgs[id].d;   // 用家自己加嘅相最優先
+  if(HAS_OFFICIAL[id]) return OFFICIAL_BASE + id + '.jpg';     // 官方 repo 圖
+  return null;                                                 // 無 → SVG 插畫
+}
 function setImg(id, dataURL){ userImgs[id] = { d: dataURL, t: Date.now() }; saveUserImgs(); schedulePush(); }
 function delImg(id){ delete userImgs[id]; saveUserImgs(); schedulePush(); }
 
@@ -662,8 +662,22 @@ function fetchPaste(url){
     .then(function(txt){ return JSON.parse(txt); })
     .catch(function(){ return null; });
 }
-// 將雲端相片 merge 入 userImgs（per-id 新 ts 贏，唔會互蓋）
-function mergeCloudImages(data){
+// 官方 seed：只填補「用家根本冇圖」嘅空位，絕對唔會蓋走用家嘅相
+// （就算用家相因舊格式而 t:0，都唔會被 seed 蓋 —— 呢條係之前「還原錯相」嘅 bug 根源）
+function mergeSeed(data){
+  if(!data || !data.images) return false;
+  var im = data.images, changed=false;
+  for(var id in im){ if(!im.hasOwnProperty(id)) continue;
+    if(userImgs[id] && userImgs[id].d) continue;   // 用家已有圖 → 跳過，唔蓋
+    var cloud = im[id];
+    if(typeof cloud === 'string'){ cloud = {d: cloud, t:0}; }
+    userImgs[id]=cloud; changed=true;
+  }
+  if(userImgs['mq_classic'] && !userImgs['hero']) userImgs['hero']=userImgs['mq_classic'];
+  return changed;
+}
+// 用家自己同步嘅相（跨裝置）：per-id 新 ts 贏（last-write-wins，唔會互蓋）
+function mergeSync(data){
   if(!data || !data.images) return false;
   var im = data.images, changed=false;
   for(var id in im){ if(!im.hasOwnProperty(id)) continue;
@@ -672,34 +686,16 @@ function mergeCloudImages(data){
     var local = userImgs[id];
     var cloudT = (cloud && cloud.t) ? cloud.t : 0;
     var localT = (local && local.t) ? local.t : 0;
-    if(!local || cloudT >= localT){ userImgs[id]=cloud; changed=true; }
+    if(!local || cloudT > localT){ userImgs[id]=cloud; changed=true; }
   }
   if(userImgs['mq_classic'] && !userImgs['hero']) userImgs['hero']=userImgs['mq_classic'];
   return changed;
 }
 
-// 拉雲端：官方 seed（原有）+ 私人相 pointer→多個 paste（分塊）
+// 拉雲端：官方圖經 repo seed/ 目錄 lazy 載入（唔使喺呢度 pull）；用家相改用匯出/匯入搬。
+// 舊有 dpaste 雲同步已暫停（dpaste 封 IP 唔可靠，且會有錯頁覆蓋風險）。
 function pullFromCloud(){
-  var seedProms = SEED_URLS.map(function(u){
-    return fetch(u, { headers:{'Accept':'application/json'} })
-      .then(function(r){ if(!r.ok) throw new Error('no'); return r.text(); })
-      .then(function(txt){ return JSON.parse(txt); })
-      .catch(function(){ return null; });
-  });
-  return Promise.all(seedProms).then(function(seedList){
-    return readPointer().then(function(ptr){
-      var batchUrls=[];
-      if(ptr && ptr.url) batchUrls.push(ptr.url);                 // 舊格式兼容
-      if(ptr && ptr.batches) ptr.batches.forEach(function(b){ if(b && b.url) batchUrls.push(b.url); });
-      return Promise.all(batchUrls.map(fetchPaste)).then(function(batchList){
-        var all=seedList.concat(batchList);
-        var changed=false;
-        all.forEach(function(data){ if(mergeCloudImages(data)) changed=true; });
-        if(changed) saveUserImgs();
-        return changed;
-      });
-    });
-  });
+  return Promise.resolve(false);
 }
 
 // 推雲端：先拉其他人嘅相 merge（避免互蓋），再分塊 POST dpaste，更新 pointer
@@ -767,11 +763,7 @@ function pushToCloud(attempt){
 }
 
 // 防 debris：加/刪相後 debounce 5 秒先推，合併多次變動
-function schedulePush(){
-  if(!SYNC_ON) return;
-  if(_pushTimer) clearTimeout(_pushTimer);
-  _pushTimer = setTimeout(function(){ pushToCloud(); }, 5000);
-}
+function schedulePush(){ /* 雲端自動同步暫停（dpaste 封 IP 唔可靠）；用家相請用「匯出/匯入」搬 */ }
 function refreshAllPics(){
   CARS.forEach(function(c){ var p=document.querySelector('[data-pic="'+c.id+'"]'); if(p&&p._svgFn) p.innerHTML=picInner(c.id,p._svgFn); });
   var hp=document.querySelector('[data-pic="hero"]'); if(hp&&hp._svgFn) hp.innerHTML=picInner('hero',hp._svgFn);
@@ -779,7 +771,7 @@ function refreshAllPics(){
 }
 function picInner(id, svgFn){
   var img = imgData(id);
-  var body = img ? '<img class="userimg" src="'+img+'" alt="">' : svgFn();
+  var body = img ? '<img class="userimg" src="'+img+'" alt="" onerror="imgErr(this,\''+id+'\')">' : svgFn();
   return body + '<button class="photobtn" data-id="'+id+'" title="加入我嘅圖片" aria-label="加入圖片">📷</button>';
 }
 var _fileInput = document.createElement('input');
@@ -878,7 +870,7 @@ function renderBook(){
   cars.forEach(function(c,i){
     var got=i<earned;
     var d=document.createElement('div'); d.className='stk'+(got?'':' locked');
-    var pic = imgData(c.id) ? '<img class="userimg" src="'+imgData(c.id)+'" alt="">' : drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight});
+    var pic = imgData(c.id) ? '<img class="userimg" src="'+imgData(c.id)+'" alt="" onerror="imgErr(this,\''+c.id+'\')">' : drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight});
     d.innerHTML='<div class="frame">'+pic+'</div><div class="nm">'+(got?c.name:'未解鎖')+'</div>';
     box.appendChild(d);
   });
@@ -902,10 +894,8 @@ document.getElementById('resetBtn').addEventListener('click', function(){
 });
 document.getElementById('resetImgsBtn').addEventListener('click', function(){
   userImgs = {}; saveUserImgs();
-  pullFromCloud().then(function(){
-    refreshAllPics();
-    setSyncStatus('已清空你加嘅圖片，官方角色圖保留 ✓');
-  });
+  refreshAllPics();
+  setSyncStatus('已清空你加嘅圖片，官方角色圖保留 ✓');
 });
 
 /* ---------- 同步 / 匯出 / 匯入 按鈕 ---------- */
@@ -920,12 +910,9 @@ if(_syncToggle){
   });
 }
 document.getElementById('syncBtn').addEventListener('click', function(){
-  setSyncStatus('同步中…');
-  pullFromCloud().then(function(changed){
-    if(changed){ refreshAllPics(); setSyncStatus('已從雲端更新 ✓ '+new Date().toLocaleTimeString()); }
-    else { setSyncStatus('已係最新 ✓'); }
-    return pushToCloud();
-  });
+  setSyncStatus('官方圖已內建網站，唔使同步。正在備份你嘅私人相…');
+  var eb = document.getElementById('exportBtn');
+  if(eb) eb.click();
 });
 document.getElementById('exportBtn').addEventListener('click', function(){
   try{
@@ -996,7 +983,7 @@ function whoQ(){
   var others = CARS.filter(function(x){return x!==c;}).sort(function(){return Math.random()-0.5;}).slice(0,2);
   var opts=[opt(c.name,c.name)].concat(others.map(function(o){return opt(o.name,o.name);}));
   shuffle(opts);
-  var carSvg = imgData(c.id) ? '<img class="quserimg" src="'+imgData(c.id)+'" alt="">'
+  var carSvg = imgData(c.id) ? '<img class="quserimg" src="'+imgData(c.id)+'" alt="" onerror="imgErr(this,\''+c.id+'\')">'
                               : drawCar({body:c.body, kind:c.kind, num:c.num, lightning:c.lightning, headlight:c.headlight});
   return {type:'who', car:true, carSvg:carSvg, _fid:c.id, text:'呢架車係邊個角色？', answer:c.name, opts:opts};
 }
@@ -1192,12 +1179,8 @@ renderBookTabs();
 renderBook();
 refill();
 nextQ();
-// 開 app 自動從雲端 seed 載入官方角色圖 + 私人相；順便將本地相（含舊有未同步嘅）推上雲
-pullFromCloud().then(function(changed){
-  if(changed){ refreshAllPics(); setSyncStatus('已從雲端載入 ✓ '+new Date().toLocaleTimeString()); }
-  else { setSyncStatus('雲端已就位 ✓'); }
-  if(SYNC_ON) schedulePush();
-});
+// 官方角色圖經網站 seed/ 目錄 lazy 載入（任何裝置都見到）；私人相留喺部機，請用匯出/匯入搬。
+setSyncStatus('官方圖已內建網站 ✓；私人相用「備份/匯出」搬去其他裝置');
 </script>
 </body>
 </html>
