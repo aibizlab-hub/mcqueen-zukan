@@ -444,13 +444,13 @@ function pushCar(o){ CARS.push(o); }
 
 /* ===== 全 MCQUEEN / Cars 系列真角色（圖經 dpaste seed 載入） ===== */
 
-/* Book 1 — 麥坤變身冊（6 款型態，真角色圖） */
+/* Book 1 — 麥坤變身冊（6 款型態，原創 SVG 唔同色；同款車唔同噴漆，避免重複相） */
 pushCar({id:'mq_classic', book:'b1', name:'經典麥坤', en:'Lightning McQueen', kind:'racer', body:'#e32017', num:'95', lightning:true, tag:'Cars 1'});
-pushCar({id:'mq_wgp', book:'b1', name:'世界大賽麥坤', en:'Lightning McQueen (WGP)', kind:'racer', body:'#e32017', num:'95', headlight:true, tag:'Cars 2'});
-pushCar({id:'mq_trainer', book:'b1', name:'教練麥坤', en:'Lightning McQueen (Trainer)', kind:'racer', body:'#e32017', num:'95', lightning:true, tag:'Cars 3'});
+pushCar({id:'mq_wgp', book:'b1', name:'世界大賽麥坤', en:'Lightning McQueen (WGP)', kind:'racer', body:'#1f6feb', num:'95', headlight:true, tag:'Cars 2'});
+pushCar({id:'mq_trainer', book:'b1', name:'教練麥坤', en:'Lightning McQueen (Trainer)', kind:'racer', body:'#2b2b2b', num:'95', lightning:true, tag:'Cars 3'});
 pushCar({id:'mq_primer', book:'b1', name:'灰底漆麥坤', en:'Lightning McQueen (Primer)', kind:'racer', body:'#9a9a9a', num:'95', tag:'Cars 3'});
 pushCar({id:'mq_mud', book:'b1', name:'泥漿麥坤', en:'Chester Whipplefilter', kind:'racer', body:'#6b4f2a', num:'95', tag:'Cars 3'});
-pushCar({id:'mq_fabulous', book:'b1', name:'藍色致敬麥坤', en:'Fabulous Lightning McQueen', kind:'racer', body:'#1f4e9b', num:'95', tag:'Cars 3'});
+pushCar({id:'mq_fabulous', book:'b1', name:'火焰麥坤', en:'Fabulous Lightning McQueen', kind:'racer', body:'#e8821e', num:'95', tag:'Cars 3'});
 
 /* Book 2 — 水箱溫泉鎮 Radiator Springs（20 位真角色） */
 pushCar({id:'mater', book:'b2', name:'拖車阿麥', en:'Mater', kind:'truck', body:'#7a5a32', tag:'最佳朋友'});
@@ -574,7 +574,7 @@ var UIMGS_KEY = 'mcqueen_user_imgs_v2';
 // 官方角色圖：直接 host 喺 GitHub Pages 嘅 seed/ 目錄（經你個 repo，穩陣、CORS OK、任何裝置都見到）
 // 每個角色一張 <id>.jpg，app 按 id lazy 載入。下面 HAS_OFFICIAL 由部署腳本注入（有圖嘅角色 id）。
 var OFFICIAL_BASE = 'https://aibizlab-hub.github.io/mcqueen-zukan/seed/';
-var HAS_OFFICIAL = {"mq_classic":1,"mq_wgp":1,"mq_trainer":1,"mq_primer":1,"mq_mud":1,"mq_fabulous":1,"mater":1,"sally":1,"doc":1,"ramone":1,"luigi":1,"guido":1,"fillmore":1,"sarge":1,"sheriff":1,"red":1,"flo":1,"lizzie":1,"stanley":1,"tex":1,"mia":1,"tia":1,"boost":1,"dj":1,"wingo":1,"snotrod":1,"chick":1,"king":1,"cal":1,"sage":1,"ernie":1,"slider":1,"dusty":1,"rusty":1,"darrell":1,"bobcut":1,"kori":1,"leerev":1,"claude":1,"winford":1,"misti":1,"francesco":1,"shu":1,"raoul":1,"rip":1,"max":1,"miguel":1,"jeff":1,"lewis":1,"nigel":1,"carla":1,"finn":1,"holley":1,"profz":1,"grem":1,"acer":1,"rod":1,"siddeley":1,"leland":1,"storm":1,"cruz":1,"sterling":1,"fritter":1,"danny":1,"ryan":1,"bubba":1,"chase":1,"tim":1,"bobby":1,"brick":1,"natalie":1,"smokey":1,"river":1,"junior":1,"louise":1,"arvy":1,"drdamage":1,"meldorado":1,"zil":1,"ivan":1,"otto":1,"gremlin":1,"crusty":1,"rm":1,"brent":1,"hobbs":1};
+var HAS_OFFICIAL = {"mater":1,"sally":1,"doc":1,"ramone":1,"luigi":1,"guido":1,"fillmore":1,"sarge":1,"sheriff":1,"red":1,"flo":1,"lizzie":1,"stanley":1,"tex":1,"mia":1,"tia":1,"boost":1,"dj":1,"wingo":1,"snotrod":1,"chick":1,"king":1,"cal":1,"sage":1,"ernie":1,"slider":1,"dusty":1,"rusty":1,"darrell":1,"bobcut":1,"kori":1,"leerev":1,"claude":1,"winford":1,"misti":1,"francesco":1,"shu":1,"raoul":1,"rip":1,"max":1,"miguel":1,"jeff":1,"lewis":1,"nigel":1,"carla":1,"finn":1,"holley":1,"profz":1,"grem":1,"acer":1,"rod":1,"siddeley":1,"leland":1,"storm":1,"cruz":1,"sterling":1,"fritter":1,"danny":1,"ryan":1,"bubba":1,"chase":1,"tim":1,"bobby":1,"brick":1,"natalie":1,"smokey":1,"river":1,"junior":1,"louise":1,"arvy":1,"drdamage":1,"meldorado":1,"zil":1,"ivan":1,"otto":1,"gremlin":1,"crusty":1,"rm":1,"brent":1,"hobbs":1};
 
 function loadUserImgs(){
   try{
