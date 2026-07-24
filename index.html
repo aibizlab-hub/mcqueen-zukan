@@ -589,8 +589,20 @@ function loadUserImgs(){
 }
 function saveUserImgs(){ try{ localStorage.setItem(UIMGS_KEY, JSON.stringify(userImgs)); }catch(e){} }
 var userImgs = loadUserImgs();
+var UIMGS_MIGRATION_KEY = 'mcqueen_user_imgs_migrated_v20260724';
+// 一次性清理：舊版雲端同步曾把錯相（人/動物）寫入 userImgs，蓋過官方相。此 migration 只跑一次。
+(function migrateStaleUserImgs(){
+  if(localStorage.getItem(UIMGS_MIGRATION_KEY)) return;
+  var changed=false;
+  var badIds = {meldorado:1, ivan:1, otto:1, brian:1, brent:1, emma:1, ryan:1, brick:1, stanley:1, mia:1, dj:1};
+  for(var id in badIds){ if(badIds.hasOwnProperty(id) && userImgs[id]){ delete userImgs[id]; changed=true; } }
+  if(changed) saveUserImgs();
+  try{ localStorage.setItem(UIMGS_MIGRATION_KEY, '1'); }catch(e){}
+})();
 function imgData(id){
-  if(userImgs[id] && userImgs[id].d) return userImgs[id].d;   // 用家自己加嘅相最優先
+  var u = userImgs[id];
+  // 用家自己加嘅相最優先；但舊雲端同步遺留、冇 timestamp（t=0）嘅錯相，對有官方相嘅角色會被忽略。
+  if(u && u.d && u.t > 0) return u.d;
   if(HAS_OFFICIAL[id]) return OFFICIAL_BASE + id + '.jpg';     // 官方 repo 圖
   return null;                                                 // 無 → SVG 插畫
 }
